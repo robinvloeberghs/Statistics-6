@@ -1,0 +1,1 @@
+data_simulated <- rnorm(n= , mean= , sd= )
