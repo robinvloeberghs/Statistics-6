@@ -1,1 +1,2 @@
+set.seed(20)
 data_simulated <- rnorm(n= , mean= , sd= )
