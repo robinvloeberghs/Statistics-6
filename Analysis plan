@@ -100,7 +100,7 @@ SD4 = (M42 - M41) / COHENSD4
 data_simulated <- rnorm(n= , mean= , sd= )
 
 ############# STATISTICAL TESTS ##############
-# Experiment 1
+# Experiment 1 - EXEMPLAR MEAN COMPARISON
 "A paired sample t-test compared mean typicalty ratings for each exemplar in the low-fluency condition against mean typicality ratings for the corresponding exemplar in the control condition"
 --> since the sample size per condition differs this results in an unequal length in data, taking average of each exemplar solves this problem
 
@@ -119,6 +119,6 @@ my_data_exp1 <- data.frame(mean_stim_all,condition)
 results <- t.test(mean_stim_all ~ condition, data = my_data_exp1, paired = TRUE)
 results
 
-# Experiment 2
-# Experiment 3
-# Experiment 4
+# Experiment 2 - EXEMPLAR MEAN COMPARISON
+# Experiment 3 - EXEMPLAR MEAN COMPARISON
+# Experiment 4 - ???
