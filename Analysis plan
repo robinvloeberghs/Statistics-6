@@ -1,2 +1,69 @@
 set.seed(20)
+############ DATA SIMULATION ############
+# Experiment 1 ###############################################
+## Variables
+N1 = 71 # Divide 'equally' into two groups, because groupsize isn't mentioned
+N10 = 35 
+N11 = 36
+NSTIM1 = 60 #15 examplars for each category
+CAT1 = 4 
+COND1 = 2 # 0 = control; 1 = low fluency
+M10 = 6.26
+M11 = 6.11
+COHENSD1 = .52
+SD1 = (M10 - M11) / COHENSD1
+lower.limit = 1
+upper.limit = 9
+
+## Create dataset
+### Colums
+PP <- c(1:N1)
+STIM <- 
+
+### Converge to dataframe
+data1_simulated <- data.frame(PP)
+#<- rnorm(N10 , mean = 6.11 , sd= SD1 ); data1_simulated <- data1_simulated[data1_simulated > lower.limit & data1_simulated < upper.limit]
+
+# Experiment 2 ###############################################
+## Variables
+N2 = 43
+NSTIM2 = 30 #5 features for each category
+CAT2 = 6
+COND2 = 2 # 0 = control; 1 = low fluency
+M21 = 6.54
+M22 = 6.70
+COHENSD2 = .79
+SD2 = (M22 - M21) / COHENSD2
+
+## Create dataset
 data_simulated <- rnorm(n= , mean= , sd= )
+
+# Experiment 3 ###############################################
+## Variables
+N3 = 164
+NSTIM3 = 60 #15 examplars for each category
+CAT3 = 4 
+COND3 = 2 # 0 = control; 1 = low fluency
+M31 = 6.27
+M32 = 6.12
+COHENSD3 = .52
+SD3 = (M31 - M32) / COHENSD3
+
+## Create dataset
+data_simulated <- rnorm(n= , mean= , sd= )
+
+# Experiment 4 ###############################################
+## Variables
+N4 = 39
+NSTIM4 = 30 #15 examplars for each category
+CAT4 = 2
+COND4 = 2 # 0 = control; 1 = low fluency
+M41 = ???
+M42 = ???
+COHENSD4 = ???
+SD4 = (M42 - M41) / COHENSD4
+
+## Create dataset
+data_simulated <- rnorm(n= , mean= , sd= )
+
+############# STATISTICAL TESTS ##############
