@@ -119,6 +119,34 @@ my_data_exp1 <- data.frame(mean_stim_all,condition)
 results <- t.test(mean_stim_all ~ condition, data = my_data_exp1, paired = TRUE)
 results
 
-# Experiment 2 - EXEMPLAR MEAN COMPARISON
-# Experiment 3 - EXEMPLAR MEAN COMPARISON
+# Experiment 2 - EXEMPLAR MEAN COMPARISON (SHOULD BE THE SAME CODE AS EXP1?)
+mean_stim_control2 <- c()
+mean_stim_fluency2 <- c()
+for (i in 1:NSTIM2){
+  mean_stim_control2 <- c(mean_stim_control2,(sum(SCOREdf2[STIMdf2==i & CONDdf2=="0"])/N20))
+  mean_stim_fluency2 <- c(mean_stim_fluency2,(sum(SCOREdf2[STIMdf2==i & CONDdf2=="1"])/N21))                       
+}
+mean_stim_all2 <- c()
+mean_stim_all2 <- append(mean_stim_all2,mean_stim_control2)
+mean_stim_all2 <- append(mean_stim_all2,mean_stim_fluency2)
+condition2 <- c(rep(0:1, each = NSTIM2))
+
+my_data_exp2 <- data.frame(mean_stim_all2,condition2)
+results2 <- t.test(mean_stim_all2 ~ condition2, data = my_data_exp2, paired = TRUE)
+
+# Experiment 3 - EXEMPLAR MEAN COMPARISON (SHOULD BE THE SAME CODE AS EXP1?)
+mean_stim_control3 <- c()
+mean_stim_fluency3 <- c()
+for (i in 1:NSTIM3){
+  mean_stim_control3 <- c(mean_stim_control3,(sum(SCOREdf3[STIMdf3==i & CONDdf3=="0"])/N30))
+  mean_stim_fluency3 <- c(mean_stim_fluency3,(sum(SCOREdf3[STIMdf3==i & CONDdf3=="1"])/N31))                       
+}
+mean_stim_all3 <- c()
+mean_stim_all3 <- append(mean_stim_all3,mean_stim_control3)
+mean_stim_all3 <- append(mean_stim_all3,mean_stim_fluency3)
+condition3 <- c(rep(0:1, each = NSTIM3))
+
+my_data_exp3 <- data.frame(mean_stim_all3,condition3)
+results3 <- t.test(mean_stim_all3 ~ condition3, data = my_data_exp3, paired = TRUE)
+
 # Experiment 4 - ???
