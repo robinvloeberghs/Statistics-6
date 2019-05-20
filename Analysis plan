@@ -64,6 +64,13 @@ COHENSD4 = ???
 SD4 = (M42 - M41) / COHENSD4
 
 ## Create dataset
-data_simulated <- rnorm(n= , mean= , sd= )
+data_low_fluency <- rnorm(n= , mean= , sd= )
+data_control <- rnorm(n= , mean= , sd= )
 
 ############# STATISTICAL TESTS ##############
+
+
+my_data <- data.frame(group = rep(c("Low fluency", "Control"), each = TOTAL_NUMBER_STIMULI
+shapiro.test(my_data$len)
+results <- t.test(data_low_fluency, data_control, paired = TRUE)
+
