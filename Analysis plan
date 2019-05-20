@@ -24,9 +24,25 @@ PPdf1 <- c(rep(1:N1, each = NSTIM1))
 STIMdf1 <- rep(c(1:NSTIM1), N1)
 CATdf1 <- c(rep(1:CAT1, each = NEXAMPLARS1))
 CONDdf1 <- c(rep(0, NSTIM1 * N10), rep(1,NSTIM1*N11))
-SCOREdf1 <- c(
-  rtruncnorm(N10*NSTIM1, a = lower.limit, b = upper.limit, mean = M10, sd = SD1),
-  rtruncnorm(N11*NSTIM1, a = lower.limit, b = upper.limit, mean = M11, sd = SD1))
+###Hierarchical model
+control1 <- c(rtruncnorm(N10, a = lower.limit, b = upper.limit, mean = M10, sd = SD1)) #sample one value for each participant (in the control condition) from the 'general' distribution with parameters values from paper 
+fluency1 <- c(rtruncnorm(N11, a = lower.limit, b = upper.limit, mean = M11, sd = SD1)) #sample one value for each participant (in the low fluency condition) from the 'general' distribution with parameters values from paper 
+
+SCORE_control1 <- c()
+SCORE_fluency1 <- c()
+
+for (i in control1){ #stimulus scores are drawn for each participant (control) with value drawn above as mean
+  SCORE_control1 <- c(SCORE_control1,(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluency1){ #stimulus scores are drawn for each participant (fluency) with value drawn above as mean
+  SCORE_fluency1 <- c(SCORE_fluency1,(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+SCOREdf1 <- c()
+SCOREdf1 <- append(SCOREdf1,SCORE_control1)
+SCOREdf1 <- append(SCOREdf1,SCORE_fluency1)
+
 
 ### Converge to dataframe
 df1 <- data.frame(PPdf1, STIMdf1, CATdf1, CONDdf1, SCOREdf1)
