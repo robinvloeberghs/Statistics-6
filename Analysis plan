@@ -1,11 +1,14 @@
 set.seed(20)
+library(truncnorm)
+
 ############ DATA SIMULATION ############
 # Experiment 1 ###############################################
 ## Variables
 N1 = 71 # Divide 'equally' into two groups, because groupsize isn't mentioned
 N10 = 35 
 N11 = 36
-NSTIM1 = 60 #15 examplars for each category
+NSTIM1 = 60 
+NEXAMPLARS1 = 15
 CAT1 = 4 
 COND1 = 2 # 0 = control; 1 = low fluency
 M10 = 6.26
@@ -16,41 +19,71 @@ lower.limit = 1
 upper.limit = 9
 
 ## Create dataset
-### Colums
-PP <- c(1:N1)
-STIM <- 
+### Columns
+PPdf1 <- c(rep(1:N1, each = NSTIM1))
+STIMdf1 <- rep(c(1:NSTIM1), N1)
+CATdf1 <- c(rep(1:CAT1, each = NEXAMPLARS1))
+CONDdf1 <- c(rep(0, NSTIM1 * N10), rep(1,NSTIM1*N11))
+SCOREdf1 <- c(
+  rtruncnorm(N10, a = lower.limit, b = upper.limit, mean = M10, sd = SD1),
+  rtruncnorm(N11, a = lower.limit, b = upper.limit, mean = M11, sd = SD1))
 
 ### Converge to dataframe
-data1_simulated <- data.frame(PP)
-#<- rnorm(N10 , mean = 6.11 , sd= SD1 ); data1_simulated <- data1_simulated[data1_simulated > lower.limit & data1_simulated < upper.limit]
+df1 <- data.frame(PPdf1, STIMdf1, CATdf1, CONDdf1, SCOREdf1)
 
 # Experiment 2 ###############################################
 ## Variables
 N2 = 43
-NSTIM2 = 30 #5 features for each category
+N20 = 22
+N21 = 21
+NSTIM2 = 30
+NFEAT2 = 5
 CAT2 = 6
 COND2 = 2 # 0 = control; 1 = low fluency
+M20 = 6.70
 M21 = 6.54
-M22 = 6.70
 COHENSD2 = .79
-SD2 = (M22 - M21) / COHENSD2
+SD2 = (M20 - M21) / COHENSD2
 
 ## Create dataset
-data_simulated <- rnorm(n= , mean= , sd= )
+### Columns
+PPdf2 <- c(rep(1:N2, each = NSTIM2))
+STIMdf2 <- rep(c(1:NSTIM2), N2)
+CATdf2 <- c(rep(1:CAT2, each = NFEAT2))
+CONDdf2 <- c(rep(0, NSTIM2 * N20), rep(1,NSTIM2*N21))
+SCOREdf2 <- c(
+  rtruncnorm(N20, a = lower.limit, b = upper.limit, mean = M20, sd = SD2),
+  rtruncnorm(N21, a = lower.limit, b = upper.limit, mean = M21, sd = SD2))
+
+### Converge to dataframe
+df2 <- data.frame(PPdf2, STIMdf2, CATdf2, CONDdf2, SCOREdf2)
 
 # Experiment 3 ###############################################
 ## Variables
 N3 = 164
+N30 = 82
+N31 = 82
 NSTIM3 = 60 #15 examplars for each category
+NEXAMPLARS3 = NEXAMPLARS1
 CAT3 = 4 
 COND3 = 2 # 0 = control; 1 = low fluency
+M30 = 6.12
 M31 = 6.27
-M32 = 6.12
 COHENSD3 = .52
-SD3 = (M31 - M32) / COHENSD3
+SD3 = (M31 - M30) / COHENSD3
 
 ## Create dataset
-data_simulated <- rnorm(n= , mean= , sd= )
+PPdf3 <- c(rep(1:N3, each = NSTIM3))
+STIMdf3 <- rep(c(1:NSTIM3), N3)
+CATdf3 <- c(rep(1:CAT3, each = NEXAMPLARS3))
+CONDdf3 <- c(rep(0, NSTIM3 * N30), rep(1,NSTIM3*N31))
+SCOREdf3 <- c(
+  rtruncnorm(N30, a = lower.limit, b = upper.limit, mean = M30, sd = SD3),
+  rtruncnorm(N31, a = lower.limit, b = upper.limit, mean = M31, sd = SD3))
+
+### Converge to dataframe
+df3 <- data.frame(PPdf3, STIMdf3, CATdf3, CONDdf3, SCOREdf3)
+
 
 # Experiment 4 ###############################################
 ## Variables
@@ -64,13 +97,10 @@ COHENSD4 = ???
 SD4 = (M42 - M41) / COHENSD4
 
 ## Create dataset
-data_low_fluency <- rnorm(n= , mean= , sd= )
-data_control <- rnorm(n= , mean= , sd= )
+data_simulated <- rnorm(n= , mean= , sd= )
 
 ############# STATISTICAL TESTS ##############
-
-
-my_data <- data.frame(group = rep(c("Low fluency", "Control"), each = ?),score = )
-shapiro.test(my_data$score)
-results <- t.test(data_low_fluency, data_control, paired = TRUE)
-
+# Experiment 1
+# Experiment 2
+# Experiment 3
+# Experiment 4
