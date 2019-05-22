@@ -1,0 +1,58 @@
+set.seed(20)
+library(truncnorm)
+
+############ DATA SIMULATION ############
+# Experiment 1 ###############################################
+## Variables
+N1 = 71 # Divide 'equally' into two groups, because groupsize isn't mentioned
+N10 = 35 
+N11 = 36
+NSTIM1 = 60 
+NEXAMPLARS1 = 15
+CAT1 = 4 
+COND1 = 2 # 0 = control; 1 = low fluency
+M10 = 6.26 
+M11 = 6.11
+COHENSD1 = .52
+SD1 = (M10 - M11) / COHENSD1
+lower.limit = 1
+upper.limit = 9
+
+## Create dataset
+### Columns
+PPdf1 <- c(rep(1:N1, each = NSTIM1))
+STIMdf1 <- rep(c(1:NSTIM1), N1)
+CATdf1 <- c(rep(1:CAT1, each = NEXAMPLARS1))
+CONDdf1 <- c(rep(0, NSTIM1 * N10), rep(1,NSTIM1*N11))
+
+### Hierarchical model
+control_stim1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M10, sd = SD1))
+fluency_stim1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M11, sd = SD1))
+
+SCORE_control1 <- c()
+SCORE_fluency1 <- c()
+SCORE_control1_ordered <- c()
+SCORE_fluency1_ordered <- c()
+
+for (i in control_stim1){ #stimulus scores are drawn for each participant (control) with value drawn above as mean
+  SCORE_control1 <- c(SCORE_control1,(rtruncnorm(N10, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluency_stim1){ #stimulus scores are drawn for each participant (control) with value drawn above as mean
+  SCORE_fluency1 <- c(SCORE_fluency1,(rtruncnorm(N11, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in N10) { # Geeft 60 waardes, maar moeten er 2100 zijn!!!!!!!
+  for (j in 0:NSTIM1-1) { 
+    SCORE_control1_ordered <- c(SCORE_control1_ordered, SCORE_control1[i + j * N10])
+  }
+}
+for (i in N11) {
+  for (j in 0:NSTIM1-1) {
+    SCORE_fluency1_ordered <- c(SCORE_fluency1_ordered, SCORE_fluency1[i + j * N11])
+  }
+}
+SCOREdf1 <- c(SCORE_control1_ordered, SCORE_fluency1_ordered)
+
+### Converge to dataframe
+df1 <- data.frame(PPdf1, STIMdf1, CATdf1, CONDdf1, SCOREdf1)
