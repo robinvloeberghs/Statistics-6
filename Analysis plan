@@ -64,13 +64,29 @@ SD2 = (M20 - M21) / COHENSD2
 
 ## Create dataset
 ### Columns
-PPdf2 <- c(rep(1:N2, each = NSTIM2))
-STIMdf2 <- rep(c(1:NSTIM2), N2)
-CATdf2 <- c(rep(1:CAT2, each = NFEAT2))
-CONDdf2 <- c(rep(0, NSTIM2 * N20), rep(1,NSTIM2*N21))
-SCOREdf2 <- c(
-  rtruncnorm(N20*NSTIM2, a = lower.limit, b = upper.limit, mean = M20, sd = SD2),
-  rtruncnorm(N21*NSTIM2, a = lower.limit, b = upper.limit, mean = M21, sd = SD2))
+PPdf2 <- c(rep(1:N2, NSTIM2))
+STIM2 <- rep(c(1:NSTIM2), each = N20) #each stimulus is repeated for every participant of the control condition
+STIMdf2 <- c(STIM2,rep(c(1:NSTIM2), each = N21)) #same as above but for the low fluency condition + merged together
+CAT2 <- c(rep(1:NCAT, each = NFEAT2*N20))
+CATdf2 <- c(CAT2,rep(1:NCAT, each = NEXAMPLARS1*N11))
+CONDdf1 <- c(rep(0, NSTIM1 * N10), rep(1,NSTIM1*N11))
+
+control1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M10, sd = SD1))
+fluency1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M11, sd = SD1))
+
+SCORE_control1 <- c()
+SCORE_fluency1 <- c()
+
+for (i in control1){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_control1 <- c(SCORE_control1,(rtruncnorm(N10, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluency1){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluency1 <- c(SCORE_fluency1,(rtruncnorm(N11, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+SCOREdf1 <- c()
+SCOREdf1 <- append(SCOREdf1,SCORE_control1)
+SCOREdf1 <- append(SCOREdf1,SCORE_fluency1)
 
 ### Converge to dataframe
 df2 <- data.frame(PPdf2, STIMdf2, CATdf2, CONDdf2, SCOREdf2)
@@ -115,6 +131,22 @@ M41 = ???
 
 ## Create dataset
 data_simulated <- rnorm(n= , mean= , sd= )
+
+
+
+###Outlier handling
+Q1 <- quantile(SCOREdf1,.25)
+Q3 <- quantile(SCOREdf1,.75)
+IQR <- (Q3 - Q1)
+lower <- Q1-1.5*IQR
+upper <- Q3+1.5*IQR
+
+no_outliers_data <- df1 [(!(SCOREdf1 < lower) & !(SCOREdf1 > upper)),]
+
+##percentage removed data (outliers)
+observations_full <- length(df1)
+observations_no_outliers <- length(no_outliers_data)
+percentage_removed_observations <- ((observations_full-observations_no_outliers)/observations_full)*100
 
 ############# STATISTICAL TESTS ##############
 # Experiment 1 - EXEMPLAR MEAN COMPARISON
