@@ -51,9 +51,8 @@ for (i in control1){ #stimulus scores are drawn for each participant with value 
 for (i in fluency1){ #stimulus scores are drawn for each participant with value drawn above as mean
   SCORE_fluency1 <- c(SCORE_fluency1,(rtruncnorm(N11, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
-SCOREdf1 <- c()
-SCOREdf1 <- append(SCOREdf1,SCORE_control1)
-SCOREdf1 <- append(SCOREdf1,SCORE_fluency1)
+
+SCOREdf1 <- c(SCORE_control1, SCORE_fluency1)
 
 ### Converge to dataframe
 df1 <- data.frame(PPdf1, STIMdf1, CATdf1, CONDdf1, SCOREdf1)
@@ -103,9 +102,8 @@ for (i in control2){ #stimulus scores are drawn for each participant with value 
 for (i in fluency2){ #stimulus scores are drawn for each participant with value drawn above as mean
   SCORE_fluency2 <- c(SCORE_fluency2,(rtruncnorm(N21, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
-SCOREdf2 <- c()
-SCOREdf2 <- append(SCOREdf2,SCORE_control2)
-SCOREdf2 <- append(SCOREdf2,SCORE_fluency2)
+
+SCOREdf2 <- c(SCORE_control2, SCORE_fluency2)
 
 ### Converge to dataframe
 df2 <- data.frame(PPdf2, STIMdf2, CATdf2, CONDdf2, SCOREdf2)
@@ -155,9 +153,9 @@ for (i in control3){ #stimulus scores are drawn for each participant with value 
 for (i in fluency3){ #stimulus scores are drawn for each participant with value drawn above as mean
   SCORE_fluency3 <- c(SCORE_fluency3,(rtruncnorm(N31, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
-SCOREdf3 <- c()
-SCOREdf3 <- append(SCOREdf3,SCORE_control3)
-SCOREdf3 <- append(SCOREdf3,SCORE_fluency3)
+
+SCOREdf3 <- c(SCORE_control3, SCORE_fluency3)
+
 
 ### Converge to dataframe
 df3 <- data.frame(PPdf3, STIMdf3, CATdf3, CONDdf3, SCOREdf3)
@@ -176,9 +174,73 @@ M41 = ???
 ## Create dataset
 data_simulated <- rnorm(n= , mean= , sd= )
 
+######## Combined experiment of exp 1 and exp 3 #########
+## Variables
+N5 = 120 # Divide equally into three groups
+N50 = N51 = N52 = N5 / 3
+NSTIM5 = 60
+NEXAMPLARS5 = 15
+NCAT5 = 4 
+COND5 = 3 # 0 = control; 1 = low fluency with explanation; 2 = low fluency without explanation
+M50 = (6.26 + 6.12)/2 
+M51 = 6.27
+M52 = 6.11
+SD50 = (SD1 + SD3) / 2
+SD51 = SD3
+SD52 = SD1
+lower.limit = 1
+upper.limit = 9
 
 
-###Outlier handling
+## Create dataset
+### Columns
+
+PPdf5 <- c(rep(1:N50, NSTIM5), rep((N50+1):(N50+N51), NSTIM5), rep((N50+N51+1):N5, NSTIM5))
+###### Participant column: 1 to .. (each pp in control) gets repeated 60 times (for each stimulus) 
+###### Participant column: the above gets repeated but now 'pp in control + 1'  to 'pp in control + low fluency with explanation'
+###### Participant column: the above gets repeated but now 'pp in control + pp in fluency w expla + 1'  to 'pp in control + low fluency with expla + low fluency without expla'
+
+STIMdf5 <- c(rep(1:NSTIM5, each = N50), rep(1:NSTIM5, each = N51), rep(1:NSTIM5, each = N52)) 
+###### Stimulus column: Each stimulus gets repeated for each participant in control condition
+###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w expl condition
+###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w/o expl condition
+
+CATdf5 <- c(rep(1:NCAT5, each = NEXAMPLARS5*N50), rep(1:NCAT5, each = NEXAMPLARS5*N51), rep(1:NCAT5, each = NEXAMPLARS5*N52)) 
+###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in control' times (for control)
+###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w expl' times(for low fluency w expl)
+###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w/o expl' times (for low fluency w/o expl)
+
+CONDdf5 <- c(rep(0, NSTIM5 * N50), rep(1, NSTIM5*N51), rep(2, NSTIM5*N52)) 
+###### Condition column: O gets repeated 60 x 'number of pp in control' times and afterwards 1 gets repeated 60 x 'n pp in low fluency w expl' times and afterwards 2 gets repeated 60 x 'n pp in low fluency w/o expl' times
+
+
+control5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M50, sd = SD50)) # Means for each stimulus in control condition
+fluencyw5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD51)) # Means for each stimulus in low fluency w expl
+fluencywo5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD52)) # Means for each stimulus in low fluency w/o expl
+
+SCORE_control5 <- c()
+SCORE_fluencyw5 <- c()
+SCORE_fluencywo5 <- c()
+
+for (i in control5){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_control5 <- c(SCORE_control5,(rtruncnorm(N50, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluencyw5){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluencyw5 <- c(SCORE_fluencyw5,(rtruncnorm(N51, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluencywo5){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluencywo5 <- c(SCORE_fluencywo5,(rtruncnorm(N52, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+SCOREdf5 <- c(SCORE_control5, SCORE_fluencyw5, SCORE_fluencywo5)
+
+### Converge to dataframe
+df5 <- data.frame(PPdf5, STIMdf5, CATdf5, CONDdf5, SCOREdf5)
+
+
+### Outlier handling
 Q1 <- quantile(SCOREdf1,.25)
 Q3 <- quantile(SCOREdf1,.75)
 IQR <- (Q3 - Q1)
@@ -187,7 +249,7 @@ upper <- Q3+1.5*IQR
 
 no_outliers_data <- df1 [(!(SCOREdf1 < lower) & !(SCOREdf1 > upper)),]
 
-##percentage removed data (outliers)
+## percentage removed data (outliers)
 observations_full <- length(df1)
 observations_no_outliers <- length(no_outliers_data)
 percentage_removed_observations <- ((observations_full-observations_no_outliers)/observations_full)*100
@@ -195,7 +257,7 @@ percentage_removed_observations <- ((observations_full-observations_no_outliers)
 ############# STATISTICAL TESTS ##############
 # Experiment 1 - EXEMPLAR MEAN COMPARISON
 "A paired sample t-test compared mean typicalty ratings for each exemplar in the low-fluency condition against mean typicality ratings for the corresponding exemplar in the control condition"
---> since the sample size per condition differs this results in an unequal length in data, taking average of each exemplar solves this problem
+#--> since the sample size per condition differs this results in an unequal length in data, taking average of each exemplar solves this problem
 
 mean_stim_control <- c()
 mean_stim_fluency <- c()
