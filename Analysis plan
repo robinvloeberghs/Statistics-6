@@ -52,6 +52,7 @@ for (i in fluency1){ #stimulus scores are drawn for each participant with value 
   SCORE_fluency1 <- c(SCORE_fluency1,(rtruncnorm(N11, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
 
+SCOREdf1 <- c()
 SCOREdf1 <- c(SCORE_control1, SCORE_fluency1)
 
 ### Converge to dataframe
@@ -103,6 +104,7 @@ for (i in fluency2){ #stimulus scores are drawn for each participant with value 
   SCORE_fluency2 <- c(SCORE_fluency2,(rtruncnorm(N21, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
 
+SCOREdf2 <- c()
 SCOREdf2 <- c(SCORE_control2, SCORE_fluency2)
 
 ### Converge to dataframe
@@ -154,6 +156,7 @@ for (i in fluency3){ #stimulus scores are drawn for each participant with value 
   SCORE_fluency3 <- c(SCORE_fluency3,(rtruncnorm(N31, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
 
+SCOREdf3 <- c()
 SCOREdf3 <- c(SCORE_control3, SCORE_fluency3)
 
 
@@ -167,14 +170,14 @@ NSTIM4 = 30 #15 examplars for each category
 CAT4 = 2
 COND4 = 2 # 0 = control; 1 = low fluency
 M41 = ???
-  M42 = ???
-  COHENSD4 = ???
-  SD4 = (M42 - M41) / COHENSD4
+M42 = ???
+COHENSD4 = ???
+SD4 = (M42 - M41) / COHENSD4
 
 ## Create dataset
 data_simulated <- rnorm(n= , mean= , sd= )
 
-######## Combined experiment of exp 1 and exp 3 #########
+# Experiment 5: Experiment 1 & 3 combined #########
 ## Variables
 N5 = 120 # Divide equally into three groups
 N50 = N51 = N52 = N5 / 3
@@ -234,6 +237,7 @@ for (i in fluencywo5){ #stimulus scores are drawn for each participant with valu
   SCORE_fluencywo5 <- c(SCORE_fluencywo5,(rtruncnorm(N52, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
 
+SCOREdf5 <- c()
 SCOREdf5 <- c(SCORE_control5, SCORE_fluencyw5, SCORE_fluencywo5)
 
 ### Converge to dataframe
@@ -255,10 +259,60 @@ observations_no_outliers <- length(no_outliers_data)
 percentage_removed_observations <- ((observations_full-observations_no_outliers)/observations_full)*100
 
 ############# STATISTICAL TESTS ##############
-# Experiment 1 - EXEMPLAR MEAN COMPARISON
-"A paired sample t-test compared mean typicalty ratings for each exemplar in the low-fluency condition against mean typicality ratings for the corresponding exemplar in the control condition"
-#--> since the sample size per condition differs this results in an unequal length in data, taking average of each exemplar solves this problem
+# Experiment 1 - EXEMPLAR MEAN COMPARISON ####
+## Descriptives 
+### Overall mean and SD
+experiment1_mean <- mean(SCOREdf1)
+experiment1_sd <- sd(SCOREdf1)
 
+### Means and SD per condition
+experiment1_controlmean <- mean(SCOREdf1[CONDdf1=='0'])
+experiment1_fluencymean<- mean(SCOREdf1[CONDdf1=='1'])
+
+experiment1_controlsd <- sd(SCOREdf1[CONDdf1=='0'])
+experiment1_fluencysd <- sd(SCOREdf1[CONDdf1=='1'])
+
+### Means and SD per stimuli (per condition)
+mean_stim <- c()
+mean_stim_control <- c()
+mean_stim_fluency <- c()
+for (i in 1:NSTIM1){
+  mean_stim <- c(mean_stim,(mean(SCOREdf1[STIMdf1==i])))
+  mean_stim_control <- c(mean_stim_control,(mean(SCOREdf1[STIMdf1==i & CONDdf1=="0"])))
+  mean_stim_fluency <- c(mean_stim_fluency,(mean(SCOREdf1[STIMdf1==i & CONDdf1=="1"])))                       
+}
+
+sd_stim <- c()
+sd_stim_control <- c()
+sd_stim_fluency <- c()
+for (i in 1:NSTIM1){
+  sd_stim <- c(sd_stim,(sd(SCOREdf1[STIMdf1==i])))
+  sd_stim_control <- c(sd_stim_control,(sd(SCOREdf1[STIMdf1==i & CONDdf1=="0"])))
+  sd_stim_fluency <- c(sd_stim_fluency,(sd(SCOREdf1[STIMdf1==i & CONDdf1=="1"])))                       
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat <- c()
+mean_cat_control <- c()
+mean_cat_fluency <- c()
+for (i in 1:NCAT){
+  mean_cat <- c(mean_cat,(mean(SCOREdf1[CATdf1==i])))
+  mean_cat_control <- c(mean_cat_control,(mean(SCOREdf1[CATdf1==i & CONDdf1=="0"])))
+  mean_cat_fluency <- c(mean_cat_fluency,(mean(SCOREdf1[CATdf1==i & CONDdf1=="1"])))                       
+}
+
+sd_cat <- c()
+sd_cat_control <- c()
+sd_cat_fluency <- c()
+for (i in 1:NCAT){
+  sd_cat <- c(sd_cat,(sd(SCOREdf1[CATdf1==i])))
+  sd_cat_control <- c(sd_cat_control,(sd(SCOREdf1[CATdf1==i & CONDdf1=="0"])))
+  sd_cat_fluency <- c(sd_cat_fluency,(sd(SCOREdf1[CATdf1==i & CONDdf1=="1"])))                       
+}
+
+## Paired t-tests
+"A paired sample t-test compared mean typicalty ratings for each exemplar in the low-fluency condition against mean typicality ratings for the corresponding exemplar in the control condition"
+"--> since the sample size per condition differs this results in an unequal length in data, taking average of each exemplar solves this problem"
 mean_stim_control <- c()
 mean_stim_fluency <- c()
 for (i in 1:NSTIM1){
@@ -274,7 +328,58 @@ my_data_exp1 <- data.frame(mean_stim_all,condition)
 results <- t.test(mean_stim_all ~ condition, data = my_data_exp1, paired = TRUE)
 results
 
-# Experiment 2 - EXEMPLAR MEAN COMPARISON (SHOULD BE THE SAME CODE AS EXP1?)
+# Experiment 2 - EXEMPLAR MEAN COMPARISON (SHOULD BE THE SAME CODE AS EXP1) ####
+## Descriptives 
+### Overall mean and SD
+experiment2_mean <- mean(SCOREdf2)
+experiment2_sd <- sd(SCOREdf2)
+
+### Means and SD per condition
+experiment2_controlmean <- mean(SCOREdf2[CONDdf2=='0'])
+experiment2_fluencymean<- mean(SCOREdf2[CONDdf2=='1'])
+
+experiment2_controlsd <- sd(SCOREdf2[CONDdf2=='0'])
+experiment2_fluencysd <- sd(SCOREdf2[CONDdf2=='1'])
+
+### Means and SD per stimuli (per condition)
+mean_stim2 <- c()
+mean_stim_control2 <- c()
+mean_stim_fluency2 <- c()
+for (i in 1:NSTIM2){
+  mean_stim2 <- c(mean_stim2,(mean(SCOREdf2[STIMdf2==i])))
+  mean_stim_control2 <- c(mean_stim_control2,(mean(SCOREdf2[STIMdf2==i & CONDdf2=="0"])))
+  mean_stim_fluency2 <- c(mean_stim_fluency2,(mean(SCOREdf2[STIMdf2==i & CONDdf2=="1"])))                       
+}
+
+sd_stim2 <- c()
+sd_stim_control2 <- c()
+sd_stim_fluency2 <- c()
+for (i in 1:NSTIM2){
+  sd_stim2 <- c(sd_stim2,(sd(SCOREdf2[STIMdf2==i])))
+  sd_stim_control2 <- c(sd_stim_control2,(sd(SCOREdf2[STIMdf2==i & CONDdf2=="0"])))
+  sd_stim_fluency2 <- c(sd_stim_fluency2,(sd(SCOREdf2[STIMdf2==i & CONDdf2=="1"])))                       
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat2 <- c()
+mean_cat_control2 <- c()
+mean_cat_fluency2 <- c()
+for (i in 1:NCAT2){
+  mean_cat2 <- c(mean_cat2,(mean(SCOREdf2[CATdf2==i])))
+  mean_cat_control2 <- c(mean_cat_control2,(mean(SCOREdf2[CATdf2==i & CONDdf2=="0"])))
+  mean_cat_fluency2 <- c(mean_cat_fluency2,(mean(SCOREdf2[CATdf2==i & CONDdf2=="1"])))                       
+}
+
+sd_cat2 <- c()
+sd_cat_control2 <- c()
+sd_cat_fluency2 <- c()
+for (i in 1:NCAT2){
+  sd_cat2 <- c(sd_cat2,(sd(SCOREdf2[CATdf2==i])))
+  sd_cat_control2 <- c(sd_cat_control2,(sd(SCOREdf2[CATdf2==i & CONDdf2=="0"])))
+  sd_cat_fluency2 <- c(sd_cat_fluency2,(sd(SCOREdf2[CATdf2==i & CONDdf2=="1"])))                       
+}
+
+## Paired t-tests
 mean_stim_control2 <- c()
 mean_stim_fluency2 <- c()
 for (i in 1:NSTIM2){
@@ -290,7 +395,58 @@ my_data_exp2 <- data.frame(mean_stim_all2,condition2)
 results2 <- t.test(mean_stim_all2 ~ condition2, data = my_data_exp2, paired = TRUE)
 results2
 
-# Experiment 3 - EXEMPLAR MEAN COMPARISON (SHOULD BE THE SAME CODE AS EXP1?)
+# Experiment 3 - EXEMPLAR MEAN COMPARISON (SHOULD BE THE SAME CODE AS EXP1) ####
+## Descriptives 
+### Overall mean and SD
+experiment3_mean <- mean(SCOREdf3)
+experiment3_sd <- sd(SCOREdf3)
+
+### Means and SD per condition
+experiment3_controlmean <- mean(SCOREdf3[CONDdf3=='0'])
+experiment3_fluencymean<- mean(SCOREdf3[CONDdf3=='1'])
+
+experiment3_controlsd <- sd(SCOREdf3[CONDdf3=='0'])
+experiment3_fluencysd <- sd(SCOREdf3[CONDdf3=='1'])
+
+### Means and SD per stimuli (per condition)
+mean_stim3 <- c()
+mean_stim_control3 <- c()
+mean_stim_fluency3 <- c()
+for (i in 1:NSTIM3){
+  mean_stim3 <- c(mean_stim3,(mean(SCOREdf3[STIMdf3==i])))
+  mean_stim_control3 <- c(mean_stim_control3,(mean(SCOREdf3[STIMdf3==i & CONDdf3=="0"])))
+  mean_stim_fluency3 <- c(mean_stim_fluency3,(mean(SCOREdf3[STIMdf3==i & CONDdf3=="1"])))                       
+}
+
+sd_stim3 <- c()
+sd_stim_control3 <- c()
+sd_stim_fluency3 <- c()
+for (i in 1:NSTIM3){
+  sd_stim3 <- c(sd_stim3,(sd(SCOREdf3[STIMdf3==i])))
+  sd_stim_control3 <- c(sd_stim_control3,(sd(SCOREdf3[STIMdf3==i & CONDdf3=="0"])))
+  sd_stim_fluency3 <- c(sd_stim_fluency3,(sd(SCOREdf3[STIMdf3==i & CONDdf3=="1"])))                       
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat3 <- c()
+mean_cat_control3 <- c()
+mean_cat_fluency3 <- c()
+for (i in 1:NCAT3){
+  mean_cat3 <- c(mean_cat3,(mean(SCOREdf3[CATdf3==i])))
+  mean_cat_control3 <- c(mean_cat_control3,(mean(SCOREdf3[CATdf3==i & CONDdf3=="0"])))
+  mean_cat_fluency3 <- c(mean_cat_fluency3,(mean(SCOREdf3[CATdf3==i & CONDdf3=="1"])))                       
+}
+
+sd_cat3 <- c()
+sd_cat_control3 <- c()
+sd_cat_fluency3 <- c()
+for (i in 1:NCAT3){
+  sd_cat3 <- c(sd_cat3,(sd(SCOREdf3[CATdf3==i])))
+  sd_cat_control3 <- c(sd_cat_control3,(sd(SCOREdf3[CATdf3==i & CONDdf3=="0"])))
+  sd_cat_fluency3 <- c(sd_cat_fluency3,(sd(SCOREdf3[CATdf3==i & CONDdf3=="1"])))                       
+}
+
+# Paired t-tests
 mean_stim_control3 <- c()
 mean_stim_fluency3 <- c()
 for (i in 1:NSTIM3){
@@ -305,4 +461,63 @@ condition3 <- c(rep(0:1, each = NSTIM3))
 my_data_exp3 <- data.frame(mean_stim_all3,condition3)
 results3 <- t.test(mean_stim_all3 ~ condition3, data = my_data_exp3, paired = TRUE)
 
-# Experiment 4 - ???
+# Experiment 4 - ??? ####
+# Experiment 5 ####
+## Descriptives 
+### Overall mean and SD
+experiment5_mean <- mean(SCOREdf5)
+experiment5_sd <- sd(SCOREdf5)
+
+### Means and SD per condition
+experiment5_controlmean <- mean(SCOREdf5[CONDdf5=='0'])
+experiment5_fluencywoemean<- mean(SCOREdf5[CONDdf5=='1'])
+experiment5_fluencywemean<- mean(SCOREdf5[CONDdf5=='2'])
+
+experiment5_controlsd <- sd(SCOREdf5[CONDdf5=='0'])
+experiment5_fluencywoesd <- sd(SCOREdf5[CONDdf5=='1'])
+experiment5_fluencywesd <- sd(SCOREdf5[CONDdf5=='2'])
+
+### Means and SD per stimuli (per condition)
+mean_stim5 <- c()
+mean_stim_control5 <- c()
+mean_stim_fluencywoe5 <- c()
+mean_stim_fluencywe5 <- c()
+for (i in 1:NSTIM5){
+  mean_stim5 <- c(mean_stim5,(mean(SCOREdf5[STIMdf5==i])))
+  mean_stim_control5 <- c(mean_stim_control5,(mean(SCOREdf3[STIMdf5==i & CONDdf5=="0"])))
+  mean_stim_fluencywoe5 <- c(mean_stim_fluencywoe5,(mean(SCOREdf3[STIMdf5==i & CONDdf5=="1"]))) 
+  mean_stim_fluencywe5 <- c(mean_stim_fluencywe5,(mean(SCOREdf3[STIMdf5==i & CONDdf5=="2"]))) 
+}
+
+sd_stim5 <- c()
+sd_stim_control5 <- c()
+sd_stim_fluencywoe5 <- c()
+sd_stim_fluencywe5 <- c()
+for (i in 1:NSTIM5){
+  sd_stim5 <- c(sd_stim5,(sd(SCOREdf3[STIMdf5==i])))
+  sd_stim_control5 <- c(sd_stim_control5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="0"])))
+  sd_stim_fluencywoe5 <- c(sd_stim_fluencywoe5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="1"])))   
+  sd_stim_fluencywe5 <- c(sd_stim_fluencywe5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="2"])))  
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat5 <- c()
+mean_cat_control5 <- c()
+mean_cat_fluencywoe5 <- c()
+mean_cat_fluencywe5 <- c()
+for (i in 1:NCAT5){
+  mean_cat5 <- c(mean_cat5,(mean(SCOREdf5[CATdf5==i])))
+  mean_cat_control5 <- c(mean_cat_control5,(mean(SCOREdf5[CATdf5==i & CONDdf5=="0"])))
+  mean_cat_fluencywoe5 <- c(mean_cat_fluencywoe5,(mean(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
+  mean_cat_fluencywe5 <- c(mean_cat_fluencywe5,(mean(SCOREdf5[CATdf5==i & CONDdf5=="2"]))) 
+}
+
+sd_cat5 <- c()
+sd_cat_control5 <- c()
+sd_cat_fluencywoe5 <- c()
+sd_cat_fluencywe5 <- c()
+for (i in 1:NCAT5){
+  sd_cat5 <- c(sd_cat5,(sd(SCOREdf5[CATdf5==i])))
+  sd_cat_control5 <- c(sd_cat_control5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="0"])))
+  sd_cat_fluencywoe5 <- c(sd_cat_fluencywoe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
+  sd_cat_fluencywe5 <- c(sd_cat_fluencywe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
