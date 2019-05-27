@@ -9,7 +9,7 @@ N10 = 35
 N11 = 36
 NSTIM1 = 60 
 NEXAMPLARS1 = 15
-CAT1 = 4 
+NCAT = 4 
 COND1 = 2 # 0 = control; 1 = low fluency
 M10 = 6.26 
 M11 = 6.11
@@ -18,31 +18,32 @@ SD1 = (M10 - M11) / COHENSD1
 lower.limit = 1
 upper.limit = 9
 
+
 ## Create dataset
 ### Columns
-PPdf1 <- c(rep(1:N1, each = NSTIM1))
-STIMdf1 <- rep(c(1:NSTIM1), N1)
-CATdf1 <- c(rep(1:CAT1, each = NEXAMPLARS1))
+PPdf1 <- c(rep(1:N1, NSTIM1))
+STIM1 <- rep(c(1:NSTIM1), each = N10) #each stimulus is repeated for every participant of the control condition
+STIMdf1 <- c(STIM1,rep(c(1:NSTIM1), each = N11)) #same as above but for the low fluency condition + merged together
+CAT1 <- c(rep(1:NCAT, each = NEXAMPLARS1*N10))
+CATdf1 <- c(CAT1,rep(1:NCAT, each = NEXAMPLARS1*N11))
 CONDdf1 <- c(rep(0, NSTIM1 * N10), rep(1,NSTIM1*N11))
-###Hierarchical model
-control1 <- c(rtruncnorm(N10, a = lower.limit, b = upper.limit, mean = M10, sd = SD1)) #sample one value for each participant (in the control condition) from the 'general' distribution with parameters values from paper 
-fluency1 <- c(rtruncnorm(N11, a = lower.limit, b = upper.limit, mean = M11, sd = SD1)) #sample one value for each participant (in the low fluency condition) from the 'general' distribution with parameters values from paper 
+
+control1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M10, sd = SD1))
+fluency1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M11, sd = SD1))
 
 SCORE_control1 <- c()
 SCORE_fluency1 <- c()
 
-for (i in control1){ #stimulus scores are drawn for each participant (control) with value drawn above as mean
-  SCORE_control1 <- c(SCORE_control1,(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+for (i in control1){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_control1 <- c(SCORE_control1,(rtruncnorm(N10, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
 
-for (i in fluency1){ #stimulus scores are drawn for each participant (fluency) with value drawn above as mean
-  SCORE_fluency1 <- c(SCORE_fluency1,(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+for (i in fluency1){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluency1 <- c(SCORE_fluency1,(rtruncnorm(N11, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
-
 SCOREdf1 <- c()
 SCOREdf1 <- append(SCOREdf1,SCORE_control1)
 SCOREdf1 <- append(SCOREdf1,SCORE_fluency1)
-
 
 ### Converge to dataframe
 df1 <- data.frame(PPdf1, STIMdf1, CATdf1, CONDdf1, SCOREdf1)
@@ -108,9 +109,9 @@ NSTIM4 = 30 #15 examplars for each category
 CAT4 = 2
 COND4 = 2 # 0 = control; 1 = low fluency
 M41 = ???
-M42 = ???
-COHENSD4 = ???
-SD4 = (M42 - M41) / COHENSD4
+  M42 = ???
+  COHENSD4 = ???
+  SD4 = (M42 - M41) / COHENSD4
 
 ## Create dataset
 data_simulated <- rnorm(n= , mean= , sd= )
