@@ -21,12 +21,22 @@ upper.limit = 9
 
 ## Create dataset
 ### Columns
-PPdf1 <- c(rep(1:N1, NSTIM1))
-STIM1 <- rep(c(1:NSTIM1), each = N10) #each stimulus is repeated for every participant of the control condition
-STIMdf1 <- c(STIM1,rep(c(1:NSTIM1), each = N11)) #same as above but for the low fluency condition + merged together
-CAT1 <- c(rep(1:NCAT, each = NEXAMPLARS1*N10))
-CATdf1 <- c(CAT1,rep(1:NCAT, each = NEXAMPLARS1*N11))
-CONDdf1 <- c(rep(0, NSTIM1 * N10), rep(1,NSTIM1*N11))
+
+PPdf1 <- c(rep(1:N10, NSTIM1), rep((N10+1):N1, NSTIM1)) 
+###### Participant column: 1 to 35 (each pp in control) gets repeated 60 times (for each stimulus) 
+###### Participant column: the above gets repeated but now 36 to 71 (each pp in low fluency)
+
+STIMdf1 <- c(rep(1:NSTIM1, each = N10), rep(1:NSTIM1, each = N11)) 
+###### Stimulus column: Each stimulus gets repeated 35 times (for each participant in control condition)
+###### Stimulus column: Each stimulus gets repeated 36 times (for each pp in low fluency)
+
+CATdf1 <- c(rep(1:NCAT, each = NEXAMPLARS1*N10), rep(1:NCAT, each = NEXAMPLARS1*N11)) 
+###### Category column: Every category gets repeated 15 x 35 times (for control)
+###### Category column: Every category gets repeated 15 x 36 times (for low fluency)
+
+CONDdf1 <- c(rep(0, NSTIM1 * N10), rep(1, NSTIM1*N11)) 
+###### Condition column: O gets repeated 60 x 35 times and afterwards 1 gets repeated 60 x 36 times
+
 
 control1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M10, sd = SD1))
 fluency1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M11, sd = SD1))
@@ -55,7 +65,7 @@ N20 = 22
 N21 = 21
 NSTIM2 = 30
 NFEAT2 = 5
-CAT2 = 6
+NCAT2 = 6
 COND2 = 2 # 0 = control; 1 = low fluency
 M20 = 6.70
 M21 = 6.54
@@ -64,29 +74,38 @@ SD2 = (M20 - M21) / COHENSD2
 
 ## Create dataset
 ### Columns
-PPdf2 <- c(rep(1:N2, NSTIM2))
-STIM2 <- rep(c(1:NSTIM2), each = N20) #each stimulus is repeated for every participant of the control condition
-STIMdf2 <- c(STIM2,rep(c(1:NSTIM2), each = N21)) #same as above but for the low fluency condition + merged together
-CAT2 <- c(rep(1:NCAT, each = NFEAT2*N20))
-CATdf2 <- c(CAT2,rep(1:NCAT, each = NEXAMPLARS1*N11))
-CONDdf1 <- c(rep(0, NSTIM1 * N10), rep(1,NSTIM1*N11))
 
-control1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M10, sd = SD1))
-fluency1 <- c(rtruncnorm(NSTIM1, a = lower.limit, b = upper.limit, mean = M11, sd = SD1))
+PPdf2 <- c(rep(1:N20, NSTIM2), rep((N20+1):N2, NSTIM2)) 
+###### Participant column: 1 to 22 (each pp in control) gets repeated 30 times (for each stimulus) 
+###### Participant column: the above gets repeated but now 23 to 43 (each pp in low fluency)
 
-SCORE_control1 <- c()
-SCORE_fluency1 <- c()
+STIMdf2 <- c(rep(1:NSTIM2, each = N20), rep(1:NSTIM2, each = N21)) 
+###### Stimulus column: Each stimulus gets repeated 22 times (for each participant in control condition)
+###### Stimulus column: Each stimulus gets repeated 21 times (for each pp in low fluency)
 
-for (i in control1){ #stimulus scores are drawn for each participant with value drawn above as mean
-  SCORE_control1 <- c(SCORE_control1,(rtruncnorm(N10, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+CATdf2 <- c(rep(1:NCAT2, each = NFEAT2*N20), rep(1:NCAT2, each = NFEAT2*N21)) 
+###### Category column: Every category gets repeated 5 x 22 times (for control)
+###### Category column: Every category gets repeated 5 x 21 times (for low fluency)
+
+CONDdf2 <- c(rep(0, NSTIM2 * N20), rep(1, NSTIM2 * N21)) 
+###### Condition column: O gets repeated 30 x 22 times and afterwards 1 gets repeated 30 x 21 times
+
+control2 <- c(rtruncnorm(NSTIM2, a = lower.limit, b = upper.limit, mean = M20, sd = SD2))
+fluency2 <- c(rtruncnorm(NSTIM2, a = lower.limit, b = upper.limit, mean = M21, sd = SD2))
+
+SCORE_control2 <- c()
+SCORE_fluency2 <- c()
+
+for (i in control2){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_control2 <- c(SCORE_control2,(rtruncnorm(N20, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
 
-for (i in fluency1){ #stimulus scores are drawn for each participant with value drawn above as mean
-  SCORE_fluency1 <- c(SCORE_fluency1,(rtruncnorm(N11, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+for (i in fluency2){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluency2 <- c(SCORE_fluency2,(rtruncnorm(N21, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
 }
-SCOREdf1 <- c()
-SCOREdf1 <- append(SCOREdf1,SCORE_control1)
-SCOREdf1 <- append(SCOREdf1,SCORE_fluency1)
+SCOREdf2 <- c()
+SCOREdf2 <- append(SCOREdf2,SCORE_control2)
+SCOREdf2 <- append(SCOREdf2,SCORE_fluency2)
 
 ### Converge to dataframe
 df2 <- data.frame(PPdf2, STIMdf2, CATdf2, CONDdf2, SCOREdf2)
@@ -98,7 +117,7 @@ N30 = 82
 N31 = 82
 NSTIM3 = 60 #15 examplars for each category
 NEXAMPLARS3 = NEXAMPLARS1
-CAT3 = 4 
+NCAT3 = 4 
 COND3 = 2 # 0 = control; 1 = low fluency
 M30 = 6.12
 M31 = 6.27
@@ -106,17 +125,42 @@ COHENSD3 = .52
 SD3 = (M31 - M30) / COHENSD3
 
 ## Create dataset
-PPdf3 <- c(rep(1:N3, each = NSTIM3))
-STIMdf3 <- rep(c(1:NSTIM3), N3)
-CATdf3 <- c(rep(1:CAT3, each = NEXAMPLARS3))
-CONDdf3 <- c(rep(0, NSTIM3 * N30), rep(1,NSTIM3*N31))
-SCOREdf3 <- c(
-  rtruncnorm(N30*NSTIM3, a = lower.limit, b = upper.limit, mean = M30, sd = SD3),
-  rtruncnorm(N31*NSTIM3, a = lower.limit, b = upper.limit, mean = M31, sd = SD3))
+### Columns
+
+PPdf3 <- c(rep(1:N30, NSTIM3), rep((N30+1):N3, NSTIM3)) 
+###### Participant column: 1 to 82 (each pp in control) gets repeated 60 times (for each stimulus) 
+###### Participant column: the above gets repeated but now 83 to 164 (each pp in low fluency)
+
+STIMdf3 <- c(rep(1:NSTIM3, each = N30), rep(1:NSTIM3, each = N31)) 
+###### Stimulus column: Each stimulus gets repeated 82 times (for each participant in control condition)
+###### Stimulus column: Each stimulus gets repeated 82 times (for each pp in low fluency)
+
+CATdf3 <- c(rep(1:NCAT3, each = NEXAMPLARS3*N30), rep(1:NCAT3, each = NEXAMPLARS3*N31)) 
+###### Category column: Every category gets repeated 15 x 82 times (for control)
+###### Category column: Every category gets repeated 15 x 82 times (for low fluency)
+
+CONDdf3 <- c(rep(0, NSTIM3 * N30), rep(1, NSTIM3 * N31)) 
+###### Condition column: O gets repeated 60 x 82 times and afterwards 1 gets repeated 60 x 82 times
+
+control3 <- c(rtruncnorm(NSTIM3, a = lower.limit, b = upper.limit, mean = M30, sd = SD3))
+fluency3 <- c(rtruncnorm(NSTIM3, a = lower.limit, b = upper.limit, mean = M31, sd = SD3))
+
+SCORE_control3 <- c()
+SCORE_fluency3 <- c()
+
+for (i in control3){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_control3 <- c(SCORE_control3,(rtruncnorm(N30, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluency3){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluency3 <- c(SCORE_fluency3,(rtruncnorm(N31, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+SCOREdf3 <- c()
+SCOREdf3 <- append(SCOREdf3,SCORE_control3)
+SCOREdf3 <- append(SCOREdf3,SCORE_fluency3)
 
 ### Converge to dataframe
 df3 <- data.frame(PPdf3, STIMdf3, CATdf3, CONDdf3, SCOREdf3)
-
 
 # Experiment 4 ###############################################
 ## Variables
