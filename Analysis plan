@@ -612,7 +612,7 @@ for (i in 1:NCAT5){
   sd_cat_control5 <- c(sd_cat_control5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="0"])))
   sd_cat_fluencywoe5 <- c(sd_cat_fluencywoe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
   sd_cat_fluencywe5 <- c(sd_cat_fluencywe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
-
+}
 ## Outliers
 ### Outlier handling
 Q1 <- quantile(SCOREdf5,.25)
