@@ -333,19 +333,39 @@ for (i in 1:NCAT2){
 }
 
 ## Outliers
-### Outlier handling
-Q1 <- quantile(SCOREdf2,.25)
-Q3 <- quantile(SCOREdf2,.75)
-IQR <- (Q3 - Q1)
-lower <- Q1-1.5*IQR
-upper <- Q3+1.5*IQR
+### Outlier handling (check if subjects had a response bias)
+mean_subjects2 <- c() #calculate mean over participants
+for (i in 1:N2){
+  mean_subjects2 <- c(mean_subjects2,(mean(SCOREdf2[PPdf2==i])))
+}
 
-no_outliers_data2 <- df2[(!(SCOREdf2 < lower) & !(SCOREdf2 > upper)),]
+mean_subjects2 <- matrix(mean_subjects2)
 
-### Percentage removed data (outliers)
-observations_full2 <- length(df2)
-observations_no_outliers2 <- length(no_outliers_data2)
+Q1_2 <- quantile(mean_subjects2,.25)
+Q3_2 <- quantile(mean_subjects2,.75)
+IQR_2 <- (Q3_2 - Q1_2)
+lower_2 <- Q1_2-1.5*IQR_2
+upper_2 <- Q3_2+1.5*IQR_2
+
+subject_outliers2 <- c() #check if a subject has a mean score above 'upper' or below 'lower' 
+for (i in 1:N2){
+  if (mean_subjects2[i,] < lower_2){
+    subject_outliers2 <- c(subject_outliers2, i)
+  }
+  if (mean_subjects2[i,] > upper_2){
+    subject_outliers2 <- c(subject_outliers2, i)
+  }
+}
+
+df2_no_outliers <- df2
+for (i in 1:length(subject_outliers2)){ #create new dataset without 'outlier subject'
+  df2_no_outliers <- df2_no_outliers[!(df2_no_outliers$PPdf2 == subject_outliers2[i]),]
+}
+  
+observations_full2 <- length(df2$SCOREdf2) #check percentage removed data (outliers)
+observations_no_outliers2 <- length(df2_no_outliers$SCOREdf2)
 percentage_removed_observations2 <- ((observations_full2-observations_no_outliers2)/observations_full2)*100
+
 
 ### Boxplot 
 mean_pp2 <- c()
@@ -444,6 +464,40 @@ my_data_exp3 <- data.frame(mean_stim_all3, condition3)
 tresults3 <- t.test(mean_stim_all3 ~ condition3, data = my_data_exp3, paired = TRUE)
 
 # Experiment 4 - ??? ####
+
+## Outliers
+### Outlier handling (check if subjects had a response bias)
+mean_subjects4 <- c() #calculate mean over participants
+for (i in 1:N4){
+  mean_subjects4 <- c(mean_subjects4,(mean(SCOREdf4[PPdf4==i])))
+}
+
+mean_subjects4 <- matrix(mean_subjects4)
+
+Q1_4 <- quantile(mean_subjects4,.25)
+Q3_4 <- quantile(mean_subjects4,.75)
+IQR_4 <- (Q3_4 - Q1_4)
+lower_4 <- Q1_4-1.5*IQR_4
+upper_4 <- Q3_4+1.5*IQR_4
+
+subject_outliers4 <- c() #check if a subject has a mean score above 'upper' or below 'lower' 
+for (i in 1:N4){
+  if (mean_subjects4[i,] < lower_4){
+    subject_outliers4 <- c(subject_outliers4, i)
+  }
+  if (mean_subjects4[i,] > upper_4){
+    subject_outliers4 <- c(subject_outliers4, i)
+  }
+}
+
+df4_no_outliers <- df4
+for (i in 1:length(subject_outliers4)){ #create new dataset without 'outlier subject'
+  df4_no_outliers <- df4_no_outliers[!(df4_no_outliers$PPdf4 == subject_outliers4[i]),]
+}
+
+observations_full4 <- length(df4$SCOREdf4) #check percentage removed data (outliers)
+observations_no_outliers4 <- length(df4_no_outliers$SCOREdf4)
+percentage_removed_observations4 <- ((observations_full4-observations_no_outliers4)/observations_full4)*100
 # Experiment 5 ####
 ## Descriptives 
 ### Overall mean and SD
@@ -504,20 +558,41 @@ for (i in 1:NCAT5){
   sd_cat_fluencywoe5 <- c(sd_cat_fluencywoe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
   sd_cat_fluencywe5 <- c(sd_cat_fluencywe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
 }
+
 ## Outliers
-### Outlier handling
-Q1 <- quantile(SCOREdf5,.25)
-Q3 <- quantile(SCOREdf5,.75)
-IQR <- (Q3 - Q1)
-lower <- Q1-1.5*IQR
-upper <- Q3+1.5*IQR
+### Outlier handling (check if subjects had a response bias)
+mean_subjects5 <- c() #calculate mean over participants
+for (i in 1:N5){
+  mean_subjects5 <- c(mean_subjects5,(mean(SCOREdf5[PPdf5==i])))
+}
 
-no_outliers_data5 <- df5[(!(SCOREdf5 < lower) & !(SCOREdf5 > upper)),]
+mean_subjects5 <- matrix(mean_subjects5)
 
-### Percentage removed data (outliers)
-observations_full5 <- length(df5)
-observations_no_outliers5 <- length(no_outliers_data5)
+Q1_5 <- quantile(mean_subjects5,.25)
+Q3_5 <- quantile(mean_subjects5,.75)
+IQR_5 <- (Q3_5 - Q1_5)
+lower_5 <- Q1_5-1.5*IQR_5
+upper_5 <- Q3_5+1.5*IQR_5
+
+subject_outliers5 <- c() #check if a subject has a mean score above 'upper' or below 'lower' 
+for (i in 1:N5){
+  if (mean_subjects5[i,] < lower_5){
+    subject_outliers5 <- c(subject_outliers5, i)
+  }
+  if (mean_subjects5[i,] > upper_5){
+    subject_outliers5 <- c(subject_outliers5, i)
+  }
+}
+
+df5_no_outliers <- df5
+for (i in 1:length(subject_outliers5)){ #create new dataset without 'outlier subject'
+  df5_no_outliers <- df5_no_outliers[!(df5_no_outliers$PPdf5 == subject_outliers5[i]),]
+}
+
+observations_full5 <- length(df5$SCOREdf5) #check percentage removed data (outliers)
+observations_no_outliers5 <- length(df5_no_outliers$SCOREdf5)
 percentage_removed_observations5 <- ((observations_full5-observations_no_outliers5)/observations_full5)*100
+
 
 ### Boxplot 
 mean_pp5 <- c()
