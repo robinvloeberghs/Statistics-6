@@ -1,5 +1,7 @@
 set.seed(20)
 library(truncnorm)
+library(ggplot2)
+library(ggiraphExtra)
 
 ############ DATA SIMULATION ############
 # Experiment 1 ###############################################
@@ -369,6 +371,24 @@ condition <- c(rep(0:1, each = NSTIM1))
 
 my_data_exp1 <- data.frame(mean_stim_all,condition)
 tresults1 <- t.test(mean_stim_all ~ condition, data = my_data_exp1, paired = TRUE)
+
+## Regression to assess interaction
+stimulus <- c(1:60)
+stimulus_order <- c(1:60)
+means_df1 <- data.frame(stimulus,mean_stim,mean_stim_control,mean_stim_fluency)
+means_df1_sorted <- data.frame(means_df1[order(means_df1[,2], decreasing = FALSE),])
+means_df1_sorted <- cbind(means_df1_sorted,stimulus_order)
+Rating <- c(means_df1_sorted$mean_stim_control,means_df1_sorted$mean_stim_fluency)
+Order <- c(rep(1:60,2))
+Condition <- rep(c("Control","Low Fluency"),each=60)
+
+data_regression <- data.frame(rating,order,condition)
+
+reg <- lm(Rating ~ Order + Condition + Order*Condition, data=data_regression)
+summary(reg)
+ggplot(data_regression,aes(y=Rating,x=Order,color=Condition))+geom_point()+stat_smooth(method="lm",se=FALSE)
+ggPredict(reg,colorAsFactor = TRUE,interactive=TRUE)
+
 
 # Experiment 2 - EXEMPLAR MEAN COMPARISON (SHOULD BE THE SAME CODE AS EXP1) ####
 ## Descriptives 
