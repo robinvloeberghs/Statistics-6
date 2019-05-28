@@ -273,7 +273,7 @@ Rating <- c(means_df1_sorted$mean_stim_control,means_df1_sorted$mean_stim_fluenc
 Order <- c(rep(1:60,2))
 Condition <- rep(c("Control","Low Fluency"),each=60)
 
-data_regression <- data.frame(rating,order,condition)
+data_regression <- data.frame(Rating,Order,Condition)
 
 reg <- lm(Rating ~ Order + Condition + Order*Condition, data=data_regression)
 summary(reg)
