@@ -17,6 +17,8 @@ M20 = 6.70
 M21 = 6.54
 COHENSD2 = .79
 SD2 = (M20 - M21) / COHENSD2
+lower.limit = 1
+upper.limit = 9
 
 ## Create dataset
 ### Columns
@@ -56,230 +58,8 @@ SCOREdf2 <- c(SCORE_control2, SCORE_fluency2)
 ### Converge to dataframe
 df2 <- data.frame(PPdf2, STIMdf2, CATdf2, CONDdf2, SCOREdf2)
 
-# Experiment 4 ###############################################
-## Variables
-N4 = 120
-N40 = N41 = N42 = N43 = N4 / 4
-NSTIM4 = 60 #15 examplars for each category
-NCAT4 = 4
-NEXAMPLAR4 = NSTIM4 / NCAT4
-NQUESTIONAIRE = 30
-COND4 = 4 # 0 = control on phase 1 & stimuli 1-30; 1 = control on phase 1 & stimuli 31-60
-# 2 = low fluency on phase 1 & stimuli 1-30; 3 = low fluency on phase 1 & stimuli 31-60
-M40 = mean(M10, M11) + (.46 / 2)
-M41 = mean(M10, M11) - (.46 / 2)
-COHENSD4 = 2.17
-SD4 = .46 / COHENSD4
-
-## Create dataset
-### Columns
-PPdf4 <- c(rep(1:N4, each = NSTIM4))
-###### Participant column: each participant number gets repeated 60 times
-
-STIMdf4 <- c(rep(1:NSTIM4, N4)) 
-###### Stimulus column: every 60 stimuli get repeated for each participant
-
-CONDdf4 <- c(rep(0, each = NSTIM4 * N40), rep(1, each = NSTIM4 * N41), rep(2, each = NSTIM4 * N42), rep(3, each = NSTIM4 * N43))
-###### Group column: every condition number gets repeated to cover every stimulus under every participant (stimulus total x groupsize)
-
-CATdf4 <- c(rep(1:NCAT4, each = NEXAMPLAR4, N4))
-###### Category column: Every category gets repeated 15 times and this sequence is repeated 120 times
-
-PHASEdf4 <- c(rep(1:2, each = NQUESTIONAIRE, N40), rep(2:1, each = NQUESTIONAIRE, N41), 
-              rep(1:2, each = NQUESTIONAIRE, N42), rep(2:1, each = NQUESTIONAIRE, N43))
-###### Phase column: participants in the first condition have stim 1 to stim 30 first, 
-######                participants in condition 2 have stim 31-60 first, ...
-
-LOWFLUENCYdf4 <- c(rep(0:1, each = NQUESTIONAIRE, N40), rep(1:0, each = NQUESTIONAIRE, N41),
-                   rep(1:0, each = NQUESTIONAIRE, N42), rep(0:1, each = NQUESTIONAIRE, N41))
-###### Condition column: participants in the first condition have stim 1-30 as control/high fluency,
-######                    participants in the second condition have stim 31-60 as low fluent
-
-control4 <- c(rtruncnorm(NSTIM4, a = lower.limit, b = upper.limit, mean = M40, sd = SD4)) # Simulate stimuli means (control)
-fluency4 <- c(rtruncnorm(NSTIM4, a = lower.limit, b = upper.limit, mean = M41, sd = SD4)) # Simulate stimuli mean (fluency)
-
-SCOREdf4 <- c()
-for (i in 0:(N4-1)){ # This loop repeats the inner loop for each participant
-  for (j in 1:NSTIM4){ # This loop checks the condition of the stimulus and samples its score accordingly, with the stimuli means created above
-    if (LOWFLUENCYdf4[j + (i * 60)] == '0') {
-      SCOREdf4 <- c(SCOREdf4, rtruncnorm(1, a = lower.limit, b = upper.limit, mean = control4[j], sd = 1))
-    } else if (LOWFLUENCYdf4[j + (i * 60)] == '1') {
-      SCOREdf4 <- c(SCOREdf4, rtruncnorm(1, a = lower.limit, b = upper.limit, mean = fluency4[j], sd = 1))
-    } else {
-    }
-  }
-}
-
-## Create dataframe
-df4 <- data.frame(PPdf4, STIMdf4, CATdf4, CONDdf4, PHASEdf4, LOWFLUENCYdf4, SCOREdf4)
-
-# Experiment 5: Experiment 1 & 3 combined #########
-## Variables
-N5 = 120 # Divide equally into three groups
-N50 = N51 = N52 = N5 / 3
-NSTIM5 = 60
-NEXAMPLARS5 = 15
-NCAT5 = 4 
-COND5 = 3 # 0 = control; 1 = low fluency with explanation; 2 = low fluency without explanation
-M50 = (6.26 + 6.12)/2 
-M51 = 6.27
-M52 = 6.11
-SD50 = (SD1 + SD3) / 2
-SD51 = SD3
-SD52 = SD1
-lower.limit = 1
-upper.limit = 9
-
-
-## Create dataset
-### Columns
-
-PPdf5 <- c(rep(1:N50, NSTIM5), rep((N50+1):(N50+N51), NSTIM5), rep((N50+N51+1):N5, NSTIM5))
-###### Participant column: 1 to .. (each pp in control) gets repeated 60 times (for each stimulus) 
-###### Participant column: the above gets repeated but now 'pp in control + 1'  to 'pp in control + low fluency with explanation'
-###### Participant column: the above gets repeated but now 'pp in control + pp in fluency w expla + 1'  to 'pp in control + low fluency with expla + low fluency without expla'
-
-STIMdf5 <- c(rep(1:NSTIM5, each = N50), rep(1:NSTIM5, each = N51), rep(1:NSTIM5, each = N52)) 
-###### Stimulus column: Each stimulus gets repeated for each participant in control condition
-###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w expl condition
-###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w/o expl condition
-
-CATdf5 <- c(rep(1:NCAT5, each = NEXAMPLARS5*N50), rep(1:NCAT5, each = NEXAMPLARS5*N51), rep(1:NCAT5, each = NEXAMPLARS5*N52)) 
-###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in control' times (for control)
-###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w expl' times(for low fluency w expl)
-###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w/o expl' times (for low fluency w/o expl)
-
-CONDdf5 <- c(rep(0, NSTIM5 * N50), rep(1, NSTIM5*N51), rep(2, NSTIM5*N52)) 
-###### Condition column: O gets repeated 60 x 'number of pp in control' times and afterwards 1 gets repeated 60 x 'n pp in low fluency w expl' times and afterwards 2 gets repeated 60 x 'n pp in low fluency w/o expl' times
-
-
-control5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M50, sd = SD50)) # Means for each stimulus in control condition
-fluencyw5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD51)) # Means for each stimulus in low fluency w expl
-fluencywo5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD52)) # Means for each stimulus in low fluency w/o expl
-
-SCORE_control5 <- c()
-SCORE_fluencyw5 <- c()
-SCORE_fluencywo5 <- c()
-
-for (i in control5){ #stimulus scores are drawn for each participant with value drawn above as mean
-  SCORE_control5 <- c(SCORE_control5,(rtruncnorm(N50, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
-}
-
-for (i in fluencyw5){ #stimulus scores are drawn for each participant with value drawn above as mean
-  SCORE_fluencyw5 <- c(SCORE_fluencyw5,(rtruncnorm(N51, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
-}
-
-for (i in fluencywo5){ #stimulus scores are drawn for each participant with value drawn above as mean
-  SCORE_fluencywo5 <- c(SCORE_fluencywo5,(rtruncnorm(N52, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
-}
-
-SCOREdf5 <- c()
-SCOREdf5 <- c(SCORE_control5, SCORE_fluencyw5, SCORE_fluencywo5)
-
-### Converge to dataframe
-df5 <- data.frame(PPdf5, STIMdf5, CATdf5, CONDdf5, SCOREdf5)
 
 ############# STATISTICAL TESTS ##############
-# Experiment 1 - EXEMPLAR MEAN COMPARISON ####
-## Descriptives 
-### Overall mean and SD
-experiment1_mean <- mean(SCOREdf1)
-experiment1_sd <- sd(SCOREdf1)
-
-### Means and SD per condition
-experiment1_controlmean <- mean(SCOREdf1[CONDdf1=='0'])
-experiment1_fluencymean<- mean(SCOREdf1[CONDdf1=='1'])
-
-experiment1_controlsd <- sd(SCOREdf1[CONDdf1=='0'])
-experiment1_fluencysd <- sd(SCOREdf1[CONDdf1=='1'])
-
-### Means and SD per stimuli (per condition)
-mean_stim <- c()
-mean_stim_control <- c()
-mean_stim_fluency <- c()
-for (i in 1:NSTIM1){
-  mean_stim <- c(mean_stim,(mean(SCOREdf1[STIMdf1==i])))
-  mean_stim_control <- c(mean_stim_control,(mean(SCOREdf1[STIMdf1==i & CONDdf1=="0"])))
-  mean_stim_fluency <- c(mean_stim_fluency,(mean(SCOREdf1[STIMdf1==i & CONDdf1=="1"])))                       
-}
-
-sd_stim <- c()
-sd_stim_control <- c()
-sd_stim_fluency <- c()
-for (i in 1:NSTIM1){
-  sd_stim <- c(sd_stim,(sd(SCOREdf1[STIMdf1==i])))
-  sd_stim_control <- c(sd_stim_control,(sd(SCOREdf1[STIMdf1==i & CONDdf1=="0"])))
-  sd_stim_fluency <- c(sd_stim_fluency,(sd(SCOREdf1[STIMdf1==i & CONDdf1=="1"])))                       
-}
-
-### Means and SD per stimulus category (per condition)
-mean_cat <- c()
-mean_cat_control <- c()
-mean_cat_fluency <- c()
-for (i in 1:NCAT){
-  mean_cat <- c(mean_cat,(mean(SCOREdf1[CATdf1==i])))
-  mean_cat_control <- c(mean_cat_control,(mean(SCOREdf1[CATdf1==i & CONDdf1=="0"])))
-  mean_cat_fluency <- c(mean_cat_fluency,(mean(SCOREdf1[CATdf1==i & CONDdf1=="1"])))                       
-}
-
-sd_cat <- c()
-sd_cat_control <- c()
-sd_cat_fluency <- c()
-for (i in 1:NCAT){
-  sd_cat <- c(sd_cat,(sd(SCOREdf1[CATdf1==i])))
-  sd_cat_control <- c(sd_cat_control,(sd(SCOREdf1[CATdf1==i & CONDdf1=="0"])))
-  sd_cat_fluency <- c(sd_cat_fluency,(sd(SCOREdf1[CATdf1==i & CONDdf1=="1"])))                       
-}
-
-## Outliers
-### Outlier handling
-Q1 <- quantile(SCOREdf1,.25)
-Q3 <- quantile(SCOREdf1,.75)
-IQR <- (Q3 - Q1)
-lower <- Q1-1.5*IQR
-upper <- Q3+1.5*IQR
-
-no_outliers_data <- df1[(!(SCOREdf1 < lower) & !(SCOREdf1 > upper)),]
-
-### Percentage removed data (outliers)
-observations_full <- length(df1)
-observations_no_outliers <- length(no_outliers_data)
-percentage_removed_observations <- ((observations_full-observations_no_outliers)/observations_full)*100
-
-### Boxplot 
-mean_pp <- c()
-for (i in 1:N1){
-  mean_pp <- c(mean_pp,(mean(SCOREdf1[PPdf1==i])))
-}
-boxplot(mean_pp, main = 'Boxplot of participant means (Experiment 1)')
-
-## Paired t-tests
-"A paired sample t-test compared mean typicalty ratings for each exemplar in the low-fluency condition against mean typicality ratings for the corresponding exemplar in the control condition"
-"--> since the sample size per condition differs this results in an unequal length in data, taking average of each exemplar solves this problem"
-mean_stim_all <- c()
-mean_stim_all <- c(mean_stim_control, mean_stim_fluency)
-condition <- c(rep(0:1, each = NSTIM1))
-
-my_data_exp1 <- data.frame(mean_stim_all,condition)
-tresults1 <- t.test(mean_stim_all ~ condition, data = my_data_exp1, paired = TRUE)
-
-## Regression to assess interaction
-stimulus <- c(1:60)
-stimulus_order <- c(1:60)
-means_df1 <- data.frame(stimulus,mean_stim,mean_stim_control,mean_stim_fluency)
-means_df1_sorted <- data.frame(means_df1[order(means_df1[,2], decreasing = FALSE),])
-means_df1_sorted <- cbind(means_df1_sorted,stimulus_order)
-Rating <- c(means_df1_sorted$mean_stim_control,means_df1_sorted$mean_stim_fluency)
-Order <- c(rep(1:60,2))
-Condition <- rep(c("Control","Low Fluency"),each=60)
-
-data_regression <- data.frame(Rating,Order,Condition)
-
-reg <- lm(Rating ~ Order + Condition + Order*Condition, data=data_regression)
-summary(reg)
-ggplot(data_regression,aes(y=Rating,x=Order,color=Condition))+geom_point()+stat_smooth(method="lm",se=FALSE)
-ggPredict(reg,colorAsFactor = TRUE,interactive=TRUE)
-
 
 # Experiment 2 - EXEMPLAR MEAN COMPARISON (SHOULD BE THE SAME CODE AS EXP1) ####
 ## Descriptives 
@@ -361,7 +141,7 @@ df2_no_outliers <- df2
 for (i in 1:length(subject_outliers2)){ #create new dataset without 'outlier subject'
   df2_no_outliers <- df2_no_outliers[!(df2_no_outliers$PPdf2 == subject_outliers2[i]),]
 }
-  
+
 observations_full2 <- length(df2$SCOREdf2) #check percentage removed data (outliers)
 observations_no_outliers2 <- length(df2_no_outliers$SCOREdf2)
 percentage_removed_observations2 <- ((observations_full2-observations_no_outliers2)/observations_full2)*100
@@ -382,88 +162,90 @@ condition2 <- c(rep(0:1, each = NSTIM2))
 my_data_exp2 <- data.frame(mean_stim_all2,condition2)
 tresults2 <- t.test(mean_stim_all2 ~ condition2, data = my_data_exp2, paired = TRUE)
 
-# Experiment 3 - EXEMPLAR MEAN COMPARISON (SHOULD BE THE SAME CODE AS EXP1) ####
-## Descriptives 
-### Overall mean and SD
-experiment3_mean <- mean(SCOREdf3)
-experiment3_sd <- sd(SCOREdf3)
 
-### Means and SD per condition
-experiment3_controlmean <- mean(SCOREdf3[CONDdf3=='0'])
-experiment3_fluencymean<- mean(SCOREdf3[CONDdf3=='1'])
+## Regression to assess interaction
+stimulus2 <- c(1:NSTIM2)
+stimulus_order2 <- c(1:NSTIM2)
+means_df2 <- data.frame(stimulus2,mean_stim2,mean_stim_control2,mean_stim_fluency2)
+means_df2_sorted <- data.frame(means_df2[order(means_df2[,2], decreasing = FALSE),]) #sort on overall mean
+means_df2_sorted <- cbind(means_df2_sorted,stimulus_order2) #stimulus order is added -> provides a rang in typicality of the stimuli
+Rating2 <- c(means_df2_sorted$mean_stim_control2,means_df2_sorted$mean_stim_fluency2) #scores of control and fluency underneath each other
+Order2 <- c(rep(1:NSTIM2,2)) 
+Condition2 <- rep(c("Control","Low Fluency"),each=NSTIM2)
 
-experiment3_controlsd <- sd(SCOREdf3[CONDdf3=='0'])
-experiment3_fluencysd <- sd(SCOREdf3[CONDdf3=='1'])
+data_regression2 <- data.frame(Rating2,Order2,Condition2)
 
-### Means and SD per stimuli (per condition)
-mean_stim3 <- c()
-mean_stim_control3 <- c()
-mean_stim_fluency3 <- c()
-for (i in 1:NSTIM3){
-  mean_stim3 <- c(mean_stim3,(mean(SCOREdf3[STIMdf3==i])))
-  mean_stim_control3 <- c(mean_stim_control3,(mean(SCOREdf3[STIMdf3==i & CONDdf3=="0"])))
-  mean_stim_fluency3 <- c(mean_stim_fluency3,(mean(SCOREdf3[STIMdf3==i & CONDdf3=="1"])))                       
+reg2 <- lm(Rating2 ~ Order2 + Condition2 + Order2*Condition2, data=data_regression2)
+summary(reg2)
+ggplot(data_regression2,aes(y=Rating2,x=Order2,color=Condition2))+geom_point()+stat_smooth(method="lm",se=FALSE)
+ggPredict(reg2,colorAsFactor = TRUE,interactive=TRUE)
+
+
+
+
+
+
+# Experiment 4 ###############################################
+## Variables
+N4 = 120
+N40 = N41 = N42 = N43 = N4 / 4
+NSTIM4 = 60 #15 examplars for each category
+NCAT4 = 4
+NEXAMPLAR4 = NSTIM4 / NCAT4
+NQUESTIONAIRE = 30
+COND4 = 4 # 0 = control on phase 1 & stimuli 1-30; 1 = control on phase 1 & stimuli 31-60
+# 2 = low fluency on phase 1 & stimuli 1-30; 3 = low fluency on phase 1 & stimuli 31-60
+M10 = 6.26 
+M11 = 6.11
+M40 = mean(M10, M11) + (.46 / 2)
+M41 = mean(M10, M11) - (.46 / 2)
+COHENSD4 = 2.17
+SD4 = .46 / COHENSD4
+
+## Create dataset
+### Columns
+PPdf4 <- c(rep(1:N4, each = NSTIM4))
+###### Participant column: each participant number gets repeated 60 times
+
+STIMdf4 <- c(rep(1:NSTIM4, N4)) 
+###### Stimulus column: every 60 stimuli get repeated for each participant
+
+CONDdf4 <- c(rep(0, each = NSTIM4 * N40), rep(1, each = NSTIM4 * N41), rep(2, each = NSTIM4 * N42), rep(3, each = NSTIM4 * N43))
+###### Group column: every condition number gets repeated to cover every stimulus under every participant (stimulus total x groupsize)
+
+CATdf4 <- c(rep(1:NCAT4, each = NEXAMPLAR4, N4))
+###### Category column: Every category gets repeated 15 times and this sequence is repeated 120 times
+
+PHASEdf4 <- c(rep(1:2, each = NQUESTIONAIRE, N40), rep(2:1, each = NQUESTIONAIRE, N41), 
+              rep(1:2, each = NQUESTIONAIRE, N42), rep(2:1, each = NQUESTIONAIRE, N43))
+###### Phase column: participants in the first condition have stim 1 to stim 30 first, 
+######                participants in condition 2 have stim 31-60 first, ...
+
+LOWFLUENCYdf4 <- c(rep(0:1, each = NQUESTIONAIRE, N40), rep(1:0, each = NQUESTIONAIRE, N41),
+                   rep(1:0, each = NQUESTIONAIRE, N42), rep(0:1, each = NQUESTIONAIRE, N41))
+###### Condition column: participants in the first condition have stim 1-30 as control/high fluency,
+######                    participants in the second condition have stim 31-60 as low fluent
+
+control4 <- c(rtruncnorm(NSTIM4, a = lower.limit, b = upper.limit, mean = M40, sd = SD4)) # Simulate stimuli means (control)
+fluency4 <- c(rtruncnorm(NSTIM4, a = lower.limit, b = upper.limit, mean = M41, sd = SD4)) # Simulate stimuli mean (fluency)
+
+SCOREdf4 <- c()
+for (i in 0:(N4-1)){ # This loop repeats the inner loop for each participant
+  for (j in 1:NSTIM4){ # This loop checks the condition of the stimulus and samples its score accordingly, with the stimuli means created above
+    if (LOWFLUENCYdf4[j + (i * 60)] == '0') {
+      SCOREdf4 <- c(SCOREdf4, rtruncnorm(1, a = lower.limit, b = upper.limit, mean = control4[j], sd = 1))
+    } else if (LOWFLUENCYdf4[j + (i * 60)] == '1') {
+      SCOREdf4 <- c(SCOREdf4, rtruncnorm(1, a = lower.limit, b = upper.limit, mean = fluency4[j], sd = 1))
+    } else {
+    }
+  }
 }
 
-sd_stim3 <- c()
-sd_stim_control3 <- c()
-sd_stim_fluency3 <- c()
-for (i in 1:NSTIM3){
-  sd_stim3 <- c(sd_stim3,(sd(SCOREdf3[STIMdf3==i])))
-  sd_stim_control3 <- c(sd_stim_control3,(sd(SCOREdf3[STIMdf3==i & CONDdf3=="0"])))
-  sd_stim_fluency3 <- c(sd_stim_fluency3,(sd(SCOREdf3[STIMdf3==i & CONDdf3=="1"])))                       
-}
+## Create dataframe
+df4 <- data.frame(PPdf4, STIMdf4, CATdf4, CONDdf4, PHASEdf4, LOWFLUENCYdf4, SCOREdf4)
 
-### Means and SD per stimulus category (per condition)
-mean_cat3 <- c()
-mean_cat_control3 <- c()
-mean_cat_fluency3 <- c()
-for (i in 1:NCAT3){
-  mean_cat3 <- c(mean_cat3,(mean(SCOREdf3[CATdf3==i])))
-  mean_cat_control3 <- c(mean_cat_control3,(mean(SCOREdf3[CATdf3==i & CONDdf3=="0"])))
-  mean_cat_fluency3 <- c(mean_cat_fluency3,(mean(SCOREdf3[CATdf3==i & CONDdf3=="1"])))                       
-}
 
-sd_cat3 <- c()
-sd_cat_control3 <- c()
-sd_cat_fluency3 <- c()
-for (i in 1:NCAT3){
-  sd_cat3 <- c(sd_cat3,(sd(SCOREdf3[CATdf3==i])))
-  sd_cat_control3 <- c(sd_cat_control3,(sd(SCOREdf3[CATdf3==i & CONDdf3=="0"])))
-  sd_cat_fluency3 <- c(sd_cat_fluency3,(sd(SCOREdf3[CATdf3==i & CONDdf3=="1"])))                       
-}
-
-## Outliers
-### Outlier handling
-Q1 <- quantile(SCOREdf3,.25)
-Q3 <- quantile(SCOREdf3,.75)
-IQR <- (Q3 - Q1)
-lower <- Q1-1.5*IQR
-upper <- Q3+1.5*IQR
-
-no_outliers_data3 <- df3[(!(SCOREdf3 < lower) & !(SCOREdf3 > upper)),]
-
-### Percentage removed data (outliers)
-observations_full3 <- length(df3)
-observations_no_outliers3 <- length(no_outliers_data3)
-percentage_removed_observations3 <- ((observations_full3-observations_no_outliers3)/observations_full3)*100
-
-### Boxplot 
-mean_pp3 <- c()
-for (i in 1:N3){
-  mean_pp3 <- c(mean_pp3,(mean(SCOREdf3[PPdf3==i])))
-}
-boxplot(mean_pp3, main = 'Boxplot of participant means (Experiment 3)')
-
-## Paired t-tests
-mean_stim_all3 <- c()
-mean_stim_all3 <- c(mean_stim_control3, mean_stim_fluency3)
-condition3 <- c(rep(0:1, each = NSTIM3))
-
-my_data_exp3 <- data.frame(mean_stim_all3, condition3)
-tresults3 <- t.test(mean_stim_all3 ~ condition3, data = my_data_exp3, paired = TRUE)
-
-# Experiment 4 - ??? ####
+############# STATISTICAL TESTS ##############
 
 ## Outliers
 ### Outlier handling (check if subjects had a response bias)
@@ -498,6 +280,107 @@ for (i in 1:length(subject_outliers4)){ #create new dataset without 'outlier sub
 observations_full4 <- length(df4$SCOREdf4) #check percentage removed data (outliers)
 observations_no_outliers4 <- length(df4_no_outliers$SCOREdf4)
 percentage_removed_observations4 <- ((observations_full4-observations_no_outliers4)/observations_full4)*100
+
+## Regression to assess interaction
+stimulus4 <- c(1:NSTIM4)
+stimulus_order4 <- c(1:NSTIM4)
+means_df4 <- data.frame(stimulus4,mean_stim4,mean_stim_control4,mean_stim_fluency4)
+means_df4_sorted <- data.frame(means_df4[order(means_df4[,2], decreasing = FALSE),])
+means_df4_sorted <- cbind(means_df4_sorted,stimulus_order4)
+Rating4 <- c(means_df4_sorted$mean_stim_control4,means_df4_sorted$mean_stim_fluency4)
+Order4 <- c(rep(1:NSTIM4,2))
+Condition4 <- rep(c("Control","Low Fluency"),each=NSTIM4)
+
+data_regression4 <- data.frame(Rating4,Order4,Condition4)
+
+reg4 <- lm(Rating4 ~ Order4 + Condition4 + Order4*Condition4, data=data_regression4)
+summary(reg4)
+ggplot(data_regression4,aes(y=Rating4,x=Order4,color=Condition4))+geom_point()+stat_smooth(method="lm",se=FALSE)
+ggPredict(reg4,colorAsFactor = TRUE,interactive=TRUE)
+
+
+
+
+
+# Experiment 5: Experiment 1 & 3 combined #########
+## Variables
+N5 = 120 # Divide equally into three groups
+N50 = N51 = N52 = N5 / 3
+NSTIM5 = 60
+NEXAMPLARS5 = 15
+NCAT5 = 4 
+COND5 = 3 # 0 = control; 1 = low fluency with explanation; 2 = low fluency without explanation
+M50 = (6.26 + 6.12)/2 
+M51 = 6.27
+M52 = 6.11
+
+COHENSD1 = .52
+SD1 = (M10 - M11) / COHENSD1
+
+M30 = 6.12
+M31 = 6.27
+COHENSD3 = .52
+SD3 = (M31 - M30) / COHENSD3
+
+SD50 = (SD1 + SD3) / 2
+SD51 = SD3
+SD52 = SD1
+lower.limit = 1
+upper.limit = 9
+
+
+## Create dataset
+### Columns
+
+PPdf5 <- c(rep(1:N50, NSTIM5), rep((N50+1):(N50+N51), NSTIM5), rep((N50+N51+1):N5, NSTIM5))
+###### Participant column: 1 to .. (each pp in control) gets repeated 60 times (for each stimulus) 
+###### Participant column: the above gets repeated but now 'pp in control + 1'  to 'pp in control + low fluency with explanation'
+###### Participant column: the above gets repeated but now 'pp in control + pp in fluency w expla + 1'  to 'pp in control + low fluency with expla + low fluency without expla'
+
+STIMdf5 <- c(rep(1:NSTIM5, each = N50), rep(1:NSTIM5, each = N51), rep(1:NSTIM5, each = N52)) 
+###### Stimulus column: Each stimulus gets repeated for each participant in control condition
+###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w expl condition
+###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w/o expl condition
+
+CATdf5 <- c(rep(1:NCAT5, each = NEXAMPLARS5*N50), rep(1:NCAT5, each = NEXAMPLARS5*N51), rep(1:NCAT5, each = NEXAMPLARS5*N52)) 
+###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in control' times (for control)
+###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w expl' times(for low fluency w expl)
+###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w/o expl' times (for low fluency w/o expl)
+
+CONDdf5 <- c(rep(0, NSTIM5 * N50), rep(1, NSTIM5*N51), rep(2, NSTIM5*N52)) 
+###### Condition column: O gets repeated 60 x 'number of pp in control' times and afterwards 1 gets repeated 60 x 'n pp in low fluency w expl' times and afterwards 2 gets repeated 60 x 'n pp in low fluency w/o expl' times
+
+
+control5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M50, sd = SD50)) # Means for each stimulus in control condition
+fluencyw5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD51)) # Means for each stimulus in low fluency w expl
+fluencywo5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD52)) # Means for each stimulus in low fluency w/o expl
+
+SCORE_control5 <- c()
+SCORE_fluencyw5 <- c()
+SCORE_fluencywo5 <- c()
+
+for (i in control5){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_control5 <- c(SCORE_control5,(rtruncnorm(N50, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluencyw5){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluencyw5 <- c(SCORE_fluencyw5,(rtruncnorm(N51, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluencywo5){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluencywo5 <- c(SCORE_fluencywo5,(rtruncnorm(N52, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+SCOREdf5 <- c()
+SCOREdf5 <- c(SCORE_control5, SCORE_fluencyw5, SCORE_fluencywo5)
+
+### Converge to dataframe
+df5 <- data.frame(PPdf5, STIMdf5, CATdf5, CONDdf5, SCOREdf5)
+
+
+
+
+############# STATISTICAL TESTS ##############
 # Experiment 5 ####
 ## Descriptives 
 ### Overall mean and SD
@@ -520,9 +403,9 @@ mean_stim_fluencywoe5 <- c()
 mean_stim_fluencywe5 <- c()
 for (i in 1:NSTIM5){
   mean_stim5 <- c(mean_stim5,(mean(SCOREdf5[STIMdf5==i])))
-  mean_stim_control5 <- c(mean_stim_control5,(mean(SCOREdf3[STIMdf5==i & CONDdf5=="0"])))
-  mean_stim_fluencywoe5 <- c(mean_stim_fluencywoe5,(mean(SCOREdf3[STIMdf5==i & CONDdf5=="1"]))) 
-  mean_stim_fluencywe5 <- c(mean_stim_fluencywe5,(mean(SCOREdf3[STIMdf5==i & CONDdf5=="2"]))) 
+  mean_stim_control5 <- c(mean_stim_control5,(mean(SCOREdf5[STIMdf5==i & CONDdf5=="0"])))
+  mean_stim_fluencywoe5 <- c(mean_stim_fluencywoe5,(mean(SCOREdf5[STIMdf5==i & CONDdf5=="1"]))) 
+  mean_stim_fluencywe5 <- c(mean_stim_fluencywe5,(mean(SCOREdf5[STIMdf5==i & CONDdf5=="2"]))) 
 }
 
 sd_stim5 <- c()
@@ -600,3 +483,22 @@ for (i in 1:N5){
   mean_pp5 <- c(mean_pp5,(mean(SCOREdf5[PPdf5==i])))
 }
 boxplot(mean_pp5, main = 'Boxplot of participant means (Experiment 5)')
+
+
+
+## Regression to assess interaction
+stimulus5 <- c(1:NSTIM5)
+stimulus_order5 <- c(1:NSTIM5)
+means_df5 <- data.frame(stimulus5,mean_stim5,mean_stim_control5,mean_stim_fluencywoe5,mean_stim_fluencywe5)
+means_df5_sorted <- data.frame(means_df5[order(means_df5[,2], decreasing = FALSE),])
+means_df5_sorted <- cbind(means_df5_sorted,stimulus_order5)
+Rating5 <- c(means_df5_sorted$mean_stim_control5,means_df5_sorted$mean_stim_fluencywoe5,means_df5_sorted$mean_stim_fluencywe5)
+Order5 <- c(rep(1:NSTIM5,3))
+Condition5 <- rep(c("Control","Low Fluency woe5","Low Fluency we5"),each=NSTIM5)
+
+data_regression5 <- data.frame(Rating5,Order5,Condition5)
+
+reg5 <- lm(Rating5 ~ Order5 + Condition5 + Order5*Condition5, data=data_regression5)
+summary(reg5)
+ggplot(data_regression5,aes(y=Rating5,x=Order5,color=Condition5))+geom_point()+stat_smooth(method="lm",se=FALSE)
+ggPredict(reg5,colorAsFactor = TRUE,interactive=TRUE)
