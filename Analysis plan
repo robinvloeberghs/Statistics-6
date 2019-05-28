@@ -243,21 +243,6 @@ SCOREdf5 <- c(SCORE_control5, SCORE_fluencyw5, SCORE_fluencywo5)
 ### Converge to dataframe
 df5 <- data.frame(PPdf5, STIMdf5, CATdf5, CONDdf5, SCOREdf5)
 
-
-### Outlier handling
-Q1 <- quantile(SCOREdf1,.25)
-Q3 <- quantile(SCOREdf1,.75)
-IQR <- (Q3 - Q1)
-lower <- Q1-1.5*IQR
-upper <- Q3+1.5*IQR
-
-no_outliers_data <- df1 [(!(SCOREdf1 < lower) & !(SCOREdf1 > upper)),]
-
-## percentage removed data (outliers)
-observations_full <- length(df1)
-observations_no_outliers <- length(no_outliers_data)
-percentage_removed_observations <- ((observations_full-observations_no_outliers)/observations_full)*100
-
 ############# STATISTICAL TESTS ##############
 # Experiment 1 - EXEMPLAR MEAN COMPARISON ####
 ## Descriptives 
@@ -309,6 +294,28 @@ for (i in 1:NCAT){
   sd_cat_control <- c(sd_cat_control,(sd(SCOREdf1[CATdf1==i & CONDdf1=="0"])))
   sd_cat_fluency <- c(sd_cat_fluency,(sd(SCOREdf1[CATdf1==i & CONDdf1=="1"])))                       
 }
+
+## Outliers
+### Outlier handling
+Q1 <- quantile(SCOREdf1,.25)
+Q3 <- quantile(SCOREdf1,.75)
+IQR <- (Q3 - Q1)
+lower <- Q1-1.5*IQR
+upper <- Q3+1.5*IQR
+
+no_outliers_data <- df1[(!(SCOREdf1 < lower) & !(SCOREdf1 > upper)),]
+
+### Percentage removed data (outliers)
+observations_full <- length(df1)
+observations_no_outliers <- length(no_outliers_data)
+percentage_removed_observations <- ((observations_full-observations_no_outliers)/observations_full)*100
+
+### Boxplot 
+mean_pp <- c()
+for (i in 1:N1){
+  mean_pp <- c(mean_pp,(mean(SCOREdf1[PPdf1==i])))
+}
+boxplot(mean_pp, main = 'Boxplot of participant means (Experiment 1)')
 
 ## Paired t-tests
 "A paired sample t-test compared mean typicalty ratings for each exemplar in the low-fluency condition against mean typicality ratings for the corresponding exemplar in the control condition"
@@ -371,6 +378,28 @@ for (i in 1:NCAT2){
   sd_cat_fluency2 <- c(sd_cat_fluency2,(sd(SCOREdf2[CATdf2==i & CONDdf2=="1"])))                       
 }
 
+## Outliers
+### Outlier handling
+Q1 <- quantile(SCOREdf2,.25)
+Q3 <- quantile(SCOREdf2,.75)
+IQR <- (Q3 - Q1)
+lower <- Q1-1.5*IQR
+upper <- Q3+1.5*IQR
+
+no_outliers_data2 <- df2[(!(SCOREdf2 < lower) & !(SCOREdf2 > upper)),]
+
+### Percentage removed data (outliers)
+observations_full2 <- length(df2)
+observations_no_outliers2 <- length(no_outliers_data2)
+percentage_removed_observations2 <- ((observations_full2-observations_no_outliers2)/observations_full2)*100
+
+### Boxplot 
+mean_pp2 <- c()
+for (i in 1:N2){
+  mean_pp2 <- c(mean_pp2,(mean(SCOREdf2[PPdf2==i])))
+}
+boxplot(mean_pp2, main = 'Boxplot of participant means (Experiment 2)')
+
 ## Paired t-tests
 mean_stim_all2 <- c()
 mean_stim_all2 <- c(mean_stim_control2, mean_stim_fluency2)
@@ -430,8 +459,29 @@ for (i in 1:NCAT3){
   sd_cat_fluency3 <- c(sd_cat_fluency3,(sd(SCOREdf3[CATdf3==i & CONDdf3=="1"])))                       
 }
 
-# Paired t-tests
-# Paired t-tests
+## Outliers
+### Outlier handling
+Q1 <- quantile(SCOREdf3,.25)
+Q3 <- quantile(SCOREdf3,.75)
+IQR <- (Q3 - Q1)
+lower <- Q1-1.5*IQR
+upper <- Q3+1.5*IQR
+
+no_outliers_data3 <- df3[(!(SCOREdf3 < lower) & !(SCOREdf3 > upper)),]
+
+### Percentage removed data (outliers)
+observations_full3 <- length(df3)
+observations_no_outliers3 <- length(no_outliers_data3)
+percentage_removed_observations3 <- ((observations_full3-observations_no_outliers3)/observations_full3)*100
+
+### Boxplot 
+mean_pp3 <- c()
+for (i in 1:N3){
+  mean_pp3 <- c(mean_pp3,(mean(SCOREdf3[PPdf3==i])))
+}
+boxplot(mean_pp3, main = 'Boxplot of participant means (Experiment 3)')
+
+## Paired t-tests
 mean_stim_all3 <- c()
 mean_stim_all3 <- c(mean_stim_control3, mean_stim_fluency3)
 condition3 <- c(rep(0:1, each = NSTIM3))
@@ -499,3 +549,25 @@ for (i in 1:NCAT5){
   sd_cat_control5 <- c(sd_cat_control5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="0"])))
   sd_cat_fluencywoe5 <- c(sd_cat_fluencywoe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
   sd_cat_fluencywe5 <- c(sd_cat_fluencywe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
+
+## Outliers
+### Outlier handling
+Q1 <- quantile(SCOREdf5,.25)
+Q3 <- quantile(SCOREdf5,.75)
+IQR <- (Q3 - Q1)
+lower <- Q1-1.5*IQR
+upper <- Q3+1.5*IQR
+
+no_outliers_data5 <- df5[(!(SCOREdf5 < lower) & !(SCOREdf5 > upper)),]
+
+### Percentage removed data (outliers)
+observations_full5 <- length(df5)
+observations_no_outliers5 <- length(no_outliers_data5)
+percentage_removed_observations5 <- ((observations_full5-observations_no_outliers5)/observations_full5)*100
+
+### Boxplot 
+mean_pp5 <- c()
+for (i in 1:N5){
+  mean_pp5 <- c(mean_pp5,(mean(SCOREdf5[PPdf5==i])))
+}
+boxplot(mean_pp5, main = 'Boxplot of participant means (Experiment 5)')
