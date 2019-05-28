@@ -246,6 +246,55 @@ df4 <- data.frame(PPdf4, STIMdf4, CATdf4, CONDdf4, PHASEdf4, LOWFLUENCYdf4, SCOR
 
 
 ############# STATISTICAL TESTS ##############
+## Descriptives 
+### Overall mean and SD
+experiment4_mean <- mean(SCOREdf4)
+experiment4_sd <- sd(SCOREdf4)
+
+### Means and SD per condition
+experiment4_controlmean <- mean(SCOREdf4[LOWFLUENCYdf4=='0'])
+experiment4_fluencymean<- mean(SCOREdf4[LOWFLUENCYdf4=='1'])
+
+experiment4_controlsd <- sd(SCOREdf4[LOWFLUENCYdf4=='0'])
+experiment4_fluencysd <- sd(SCOREdf4[LOWFLUENCYf4=='1'])
+
+### Means and SD per stimuli (per condition)
+mean_stim4 <- c()
+mean_stim_control4 <- c()
+mean_stim_fluency4 <- c()
+for (i in 1:NSTIM4){
+  mean_stim4 <- c(mean_stim4,(mean(SCOREdf4[STIMdf4==i])))
+  mean_stim_control4 <- c(mean_stim_control4,(mean(SCOREdf4[STIMdf4==i & LOWFLUENCYdf4=="0"])))
+  mean_stim_fluency4 <- c(mean_stim_fluency4,(mean(SCOREdf4[STIMdf4==i & LOWFLUENCYdf4=="1"])))                       
+}
+
+sd_stim4 <- c()
+sd_stim_control4 <- c()
+sd_stim_fluency4 <- c()
+for (i in 1:NSTIM4){
+  sd_stim4 <- c(sd_stim4,(sd(SCOREdf4[STIMdf4==i])))
+  sd_stim_control4 <- c(sd_stim_control4,(sd(SCOREdf4[STIMdf4==i & LOWFLUENCYdf4=="0"])))
+  sd_stim_fluency4 <- c(sd_stim_fluency4,(sd(SCOREdf4[STIMdf4==i & LOWFLUENCYdf4=="1"])))                       
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat4 <- c()
+mean_cat_control4 <- c()
+mean_cat_fluency4 <- c()
+for (i in 1:NCAT4){
+  mean_cat4 <- c(mean_cat4,(mean(SCOREdf4[CATdf4==i])))
+  mean_cat_control4 <- c(mean_cat_control4,(mean(SCOREdf4[CATdf4==i & LOWFLUENCYdf4=="0"])))
+  mean_cat_fluency4 <- c(mean_cat_fluency4,(mean(SCOREdf4[CATdf4==i & LOWFLUENCYdf4=="1"])))                       
+}
+
+sd_cat4 <- c()
+sd_cat_control4 <- c()
+sd_cat_fluency4 <- c()
+for (i in 1:NCAT4){
+  sd_cat4 <- c(sd_cat4,(sd(SCOREdf4[CATdf4==i])))
+  sd_cat_control4 <- c(sd_cat_control4,(sd(SCOREdf4[CATdf4==i & LOWFLUENCYdf4=="0"])))
+  sd_cat_fluency4 <- c(sd_cat_fluency4,(sd(SCOREdf4[CATdf4==i & LOWFLUENCYdf4=="1"])))                       
+}
 
 ## Outliers
 ### Outlier handling (check if subjects had a response bias)
