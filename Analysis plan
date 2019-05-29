@@ -4,6 +4,303 @@ library(ggplot2)
 library(ggiraphExtra)
 library(afex)
 
+############################### Experiment 1: Experiment 1 & 3 combined ##################################
+# Variables coded for previously named experiment 5 #
+## Variables
+N5 = 120 # Divide equally into three groups
+N50 = N51 = N52 = N5 / 3
+NSTIM5 = 60
+NEXAMPLARS5 = 15
+NCAT5 = 4 
+COND5 = 3 # 0 = control; 1 = low fluency with explanation; 2 = low fluency without explanation
+M50 = (6.26 + 6.12)/2 
+M51 = 6.27
+M52 = 6.11
+
+COHENSD1 = .52
+SD1 = (M10 - M11) / COHENSD1
+
+M30 = 6.12
+M31 = 6.27
+COHENSD3 = .52
+SD3 = (M31 - M30) / COHENSD3
+
+SD50 = (SD1 + SD3) / 2
+SD51 = SD3
+SD52 = SD1
+lower.limit = 1
+upper.limit = 9
+
+
+## Create dataset
+### Columns
+
+PPdf5 <- c(rep(1:N50, NSTIM5), rep((N50+1):(N50+N51), NSTIM5), rep((N50+N51+1):N5, NSTIM5))
+###### Participant column: 1 to .. (each pp in control) gets repeated 60 times (for each stimulus) 
+###### Participant column: the above gets repeated but now 'pp in control + 1'  to 'pp in control + low fluency with explanation'
+###### Participant column: the above gets repeated but now 'pp in control + pp in fluency w expla + 1'  to 'pp in control + low fluency with expla + low fluency without expla'
+
+STIMdf5 <- c(rep(1:NSTIM5, each = N50), rep(1:NSTIM5, each = N51), rep(1:NSTIM5, each = N52)) 
+###### Stimulus column: Each stimulus gets repeated for each participant in control condition
+###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w expl condition
+###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w/o expl condition
+
+CATdf5 <- c(rep(1:NCAT5, each = NEXAMPLARS5*N50), rep(1:NCAT5, each = NEXAMPLARS5*N51), rep(1:NCAT5, each = NEXAMPLARS5*N52)) 
+###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in control' times (for control)
+###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w expl' times(for low fluency w expl)
+###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w/o expl' times (for low fluency w/o expl)
+
+CONDdf5 <- c(rep(0, NSTIM5 * N50), rep(1, NSTIM5*N51), rep(2, NSTIM5*N52)) 
+###### Condition column: O gets repeated 60 x 'number of pp in control' times and afterwards 1 gets repeated 60 x 'n pp in low fluency w expl' times and afterwards 2 gets repeated 60 x 'n pp in low fluency w/o expl' times
+
+
+control5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M50, sd = SD50)) # Means for each stimulus in control condition
+fluencyw5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD51)) # Means for each stimulus in low fluency w expl
+fluencywo5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD52)) # Means for each stimulus in low fluency w/o expl
+
+SCORE_control5 <- c()
+SCORE_fluencyw5 <- c()
+SCORE_fluencywo5 <- c()
+
+for (i in control5){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_control5 <- c(SCORE_control5,(rtruncnorm(N50, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluencyw5){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluencyw5 <- c(SCORE_fluencyw5,(rtruncnorm(N51, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+for (i in fluencywo5){ #stimulus scores are drawn for each participant with value drawn above as mean
+  SCORE_fluencywo5 <- c(SCORE_fluencywo5,(rtruncnorm(N52, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
+}
+
+SCOREdf5 <- c()
+SCOREdf5 <- c(SCORE_control5, SCORE_fluencyw5, SCORE_fluencywo5)
+
+### Converge to dataframe
+df5 <- data.frame(PPdf5, STIMdf5, CATdf5, CONDdf5, SCOREdf5)
+
+
+
+
+############# STATISTICAL TESTS EXPERIMENT 1 ##############
+## Outliers
+### Outlier handling (check if subjects had a response bias)
+mean_subjects5 <- c() #calculate mean over participants
+for (i in 1:N5){
+  mean_subjects5 <- c(mean_subjects5,(mean(SCOREdf5[PPdf5==i])))
+}
+
+mean_subjects5 <- matrix(mean_subjects5)
+
+Q1_5 <- quantile(mean_subjects5,.25)
+Q3_5 <- quantile(mean_subjects5,.75)
+IQR_5 <- (Q3_5 - Q1_5)
+lower_5 <- Q1_5-1.5*IQR_5
+upper_5 <- Q3_5+1.5*IQR_5
+
+subject_outliers5 <- c() #check if a subject has a mean score above 'upper' or below 'lower' 
+for (i in 1:N5){
+  if (mean_subjects5[i,] < lower_5){
+    subject_outliers5 <- c(subject_outliers5, i)
+  }
+  if (mean_subjects5[i,] > upper_5){
+    subject_outliers5 <- c(subject_outliers5, i)
+  }
+}
+
+df5_no_outliers <- df5
+if (length(subject_outliers5) != 0){
+  for (i in 1:length(subject_outliers5)){ #create new dataset without 'outlier subject'
+   df5_no_outliers <- df5_no_outliers[!(df5_no_outliers$PPdf5 == subject_outliers5[i]),]
+  }
+}
+
+observations_full5 <- length(df5$SCOREdf5) #check percentage removed data (outliers)
+observations_no_outliers5 <- length(df5_no_outliers$SCOREdf5)
+percentage_removed_observations5 <- ((observations_full5-observations_no_outliers5)/observations_full5)*100
+
+
+### Boxplot 
+mean_pp5 <- c()
+for (i in 1:N5){
+  mean_pp5 <- c(mean_pp5,(mean(SCOREdf5[PPdf5==i])))
+}
+boxplot(mean_pp5, main = 'Boxplot of participant means (Experiment 5)')
+
+## Descriptives 
+### Overall mean and SD
+experiment5_mean <- mean(SCOREdf5)
+experiment5_sd <- sd(SCOREdf5)
+
+### Means and SD per condition
+experiment5_controlmean <- mean(SCOREdf5[CONDdf5=='0'])
+experiment5_fluencywoemean<- mean(SCOREdf5[CONDdf5=='1'])
+experiment5_fluencywemean<- mean(SCOREdf5[CONDdf5=='2'])
+
+experiment5_controlsd <- sd(SCOREdf5[CONDdf5=='0'])
+experiment5_fluencywoesd <- sd(SCOREdf5[CONDdf5=='1'])
+experiment5_fluencywesd <- sd(SCOREdf5[CONDdf5=='2'])
+
+### Means and SD per stimuli (per condition)
+mean_stim5 <- c()
+mean_stim_control5 <- c()
+mean_stim_fluencywoe5 <- c()
+mean_stim_fluencywe5 <- c()
+for (i in 1:NSTIM5){
+  mean_stim5 <- c(mean_stim5,(mean(SCOREdf5[STIMdf5==i])))
+  mean_stim_control5 <- c(mean_stim_control5,(mean(SCOREdf5[STIMdf5==i & CONDdf5=="0"])))
+  mean_stim_fluencywoe5 <- c(mean_stim_fluencywoe5,(mean(SCOREdf5[STIMdf5==i & CONDdf5=="1"]))) 
+  mean_stim_fluencywe5 <- c(mean_stim_fluencywe5,(mean(SCOREdf5[STIMdf5==i & CONDdf5=="2"]))) 
+}
+
+sd_stim5 <- c()
+sd_stim_control5 <- c()
+sd_stim_fluencywoe5 <- c()
+sd_stim_fluencywe5 <- c()
+for (i in 1:NSTIM5){
+  sd_stim5 <- c(sd_stim5,(sd(SCOREdf5[STIMdf5==i])))
+  sd_stim_control5 <- c(sd_stim_control5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="0"])))
+  sd_stim_fluencywoe5 <- c(sd_stim_fluencywoe5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="1"])))   
+  sd_stim_fluencywe5 <- c(sd_stim_fluencywe5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="2"])))  
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat5 <- c()
+mean_cat_control5 <- c()
+mean_cat_fluencywoe5 <- c()
+mean_cat_fluencywe5 <- c()
+for (i in 1:NCAT5){
+  mean_cat5 <- c(mean_cat5,(mean(SCOREdf5[CATdf5==i])))
+  mean_cat_control5 <- c(mean_cat_control5,(mean(SCOREdf5[CATdf5==i & CONDdf5=="0"])))
+  mean_cat_fluencywoe5 <- c(mean_cat_fluencywoe5,(mean(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
+  mean_cat_fluencywe5 <- c(mean_cat_fluencywe5,(mean(SCOREdf5[CATdf5==i & CONDdf5=="2"]))) 
+}
+
+sd_cat5 <- c()
+sd_cat_control5 <- c()
+sd_cat_fluencywoe5 <- c()
+sd_cat_fluencywe5 <- c()
+for (i in 1:NCAT5){
+  sd_cat5 <- c(sd_cat5,(sd(SCOREdf5[CATdf5==i])))
+  sd_cat_control5 <- c(sd_cat_control5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="0"])))
+  sd_cat_fluencywoe5 <- c(sd_cat_fluencywoe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
+  sd_cat_fluencywe5 <- c(sd_cat_fluencywe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
+}
+
+## Repeated measures ANOVA
+### Check Assumptions
+#### Normality
+normality5 <- shapiro.test(STIMdf5)
+#### Sphericity - is integrated into aov_ez() function
+
+### Test
+anova5 <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5, within = 'CONDdf5', correction = 'none')
+
+## Regression to assess interaction
+stimulus5 <- c(1:NSTIM5)
+stimulus_order5 <- c(1:NSTIM5)
+means_df5 <- data.frame(stimulus5,mean_stim5,mean_stim_control5,mean_stim_fluencywoe5,mean_stim_fluencywe5)
+means_df5_sorted <- data.frame(means_df5[order(means_df5[,2], decreasing = FALSE),])
+means_df5_sorted <- cbind(means_df5_sorted,stimulus_order5)
+Rating5 <- c(means_df5_sorted$mean_stim_control5,means_df5_sorted$mean_stim_fluencywoe5,means_df5_sorted$mean_stim_fluencywe5)
+Order5 <- c(rep(1:NSTIM5,3))
+Condition5 <- rep(c("Control","Low Fluency woe5","Low Fluency we5"),each=NSTIM5)
+
+data_regression5 <- data.frame(Rating5,Order5,Condition5)
+
+reg5 <- lm(Rating5 ~ Order5 + Condition5 + Order5*Condition5, data=data_regression5)
+summary(reg5)
+ggplot(data_regression5,aes(y=Rating5,x=Order5,color=Condition5))+geom_point()+stat_smooth(method="lm",se=FALSE)
+ggPredict(reg5,colorAsFactor = TRUE,interactive=TRUE)
+
+############## Experiment 1 Without Outliers ################# 
+# 'wo' added to variable name means WITHOUT outlier #
+## Descriptives 
+### Overall mean and SD
+experiment5wo_mean <- mean(df5_no_outliers$SCOREdf5)
+experiment5wo_sd <- sd(df5_no_outliers$SCOREdf5)
+
+### Means and SD per condition
+experiment5wo_controlmean <- mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='0'])
+experiment5wo_fluencywoemean<- mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='1'])
+experiment5wo_fluencywemean<- mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='2'])
+
+experiment5wo_controlsd <- sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='0'])
+experiment5wo_fluencywoesd <- sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='1'])
+experiment5wo_fluencywesd <- sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='2'])
+
+### Means and SD per stimuli (per condition)
+mean_stim5wo <- c()
+mean_stim_control5wo <- c()
+mean_stim_fluencywoe5wo <- c()
+mean_stim_fluencywe5wo <- c()
+for (i in 1:NSTIM5){
+  mean_stim5wo <- c(mean_stim5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i])))
+  mean_stim_control5wo <- c(mean_stim_control5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="0"])))
+  mean_stim_fluencywoe5wo <- c(mean_stim_fluencywoe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
+  mean_stim_fluencywe5wo <- c(mean_stim_fluencywe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="2"]))) 
+}
+
+sd_stim5wo <- c()
+sd_stim_control5wo <- c()
+sd_stim_fluencywoe5wo <- c()
+sd_stim_fluencywe5wo <- c()
+for (i in 1:NSTIM5){
+  sd_stim5wo <- c(sd_stim5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i])))
+  sd_stim_control5wo <- c(sd_stim_control5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="0"])))
+  sd_stim_fluencywoe5wo <- c(sd_stim_fluencywoe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="1"])))   
+  sd_stim_fluencywe5wo <- c(sd_stim_fluencywe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="2"])))  
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat5wo <- c()
+mean_cat_control5wo <- c()
+mean_cat_fluencywoe5wo <- c()
+mean_cat_fluencywe5wo <- c()
+for (i in 1:NCAT5){
+  mean_cat5wo <- c(mean_cat5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i])))
+  mean_cat_control5wo <- c(mean_cat_control5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="0"])))
+  mean_cat_fluencywoe5wo <- c(mean_cat_fluencywoe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
+  mean_cat_fluencywe5wo <- c(mean_cat_fluencywe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="2"]))) 
+}
+
+sd_cat5wo <- c()
+sd_cat_control5wo <- c()
+sd_cat_fluencywoe5wo <- c()
+sd_cat_fluencywe5wo <- c()
+for (i in 1:NCAT5){
+  sd_cat5wo <- c(sd_cat5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i])))
+  sd_cat_control5wo <- c(sd_cat_control5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="0"])))
+  sd_cat_fluencywoe5wo <- c(sd_cat_fluencywoe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
+  sd_cat_fluencywe5wo <- c(sd_cat_fluencywe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
+}
+
+## Repeated measures ANOVA
+### Check Assumptions
+#### Normality
+normality5wo <- shapiro.test(df5_no_outliers$STIMdf5)
+#### Sphericity - is integrated into aov_ez() function
+
+### Test
+anova5wo <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5_no_outliers, within = 'CONDdf5', correction = 'none')
+
+## Regression to assess interaction
+stimulus5 <- c(1:NSTIM5)
+stimulus_order5 <- c(1:NSTIM5)
+means_df5wo <- data.frame(stimulus5,mean_stim5wo,mean_stim_control5wo,mean_stim_fluencywoe5wo,mean_stim_fluencywe5wo)
+means_df5wo_sorted <- data.frame(means_df5wo[order(means_df5wo[,2], decreasing = FALSE),])
+means_df5wo_sorted <- cbind(means_df5wo_sorted,stimulus_order5)
+Rating5wo <- c(means_df5wo_sorted$mean_stim_control5wo,means_df5wo_sorted$mean_stim_fluencywoe5wo,means_df5wo_sorted$mean_stim_fluencywe5wo)
+Order5 <- c(rep(1:NSTIM5,3))
+Condition5 <- rep(c("Control","Low Fluency woe5","Low Fluency we5"),each=NSTIM5)
+
+data_regression5wo <- data.frame(Rating5wo,Order5,Condition5)
+
+reg5wo <- lm(Rating5wo ~ Order5 + Condition5 + Order5*Condition5, data=data_regression5wo)
+summary(reg5wo)
+ggplot(data_regression5wo,aes(y=Rating5wo,x=Order5,color=Condition5))+geom_point()+stat_smooth(method="lm",se=FALSE)
+ggPredict(reg5wo,colorAsFactor = TRUE,interactive=TRUE)
 ############ DATA SIMULATION ############
 ################################ Experiment 2 ###############################################
 ## Variables
@@ -263,7 +560,8 @@ ggPredict(reg2wo,colorAsFactor = TRUE,interactive=TRUE)
 
 
 
-#################################### Experiment 4 ###############################################
+#################################### Experiment 3 ###############################################
+# Variables coded for previously named experiment 4 #
 ## Variables
 N4 = 120
 N40 = N41 = N42 = N43 = N4 / 4
@@ -323,7 +621,7 @@ for (i in 0:(N4-1)){ # This loop repeats the inner loop for each participant
 df4 <- data.frame(PPdf4, STIMdf4, CATdf4, CONDdf4, PHASEdf4, LOWFLUENCYdf4, SCOREdf4)
 
 
-############# STATISTICAL TESTS EXPERIMENT 4 ##############
+############# STATISTICAL TESTS EXPERIMENT 3 ##############
 ## Outliers
 ### Outlier handling (check if subjects had a response bias)
 mean_subjects4 <- c() #calculate mean over participants
@@ -440,7 +738,7 @@ summary(reg4)
 ggplot(data_regression4,aes(y=Rating4,x=Order4,color=Condition4))+geom_point()+stat_smooth(method="lm",se=FALSE)
 ggPredict(reg4,colorAsFactor = TRUE,interactive=TRUE)
 
-############## Experiment 4 Without Outliers ################# 
+############## Experiment 3 Without Outliers ################# 
 # 'wo' added to variable name means WITHOUT outlier #
 ## Descriptives 
 ### Overall mean and SD
@@ -519,299 +817,4 @@ ggPredict(reg4wo,colorAsFactor = TRUE,interactive=TRUE)
 
 
 
-############################### Experiment 5: Experiment 1 & 3 combined ##################################
-## Variables
-N5 = 120 # Divide equally into three groups
-N50 = N51 = N52 = N5 / 3
-NSTIM5 = 60
-NEXAMPLARS5 = 15
-NCAT5 = 4 
-COND5 = 3 # 0 = control; 1 = low fluency with explanation; 2 = low fluency without explanation
-M50 = (6.26 + 6.12)/2 
-M51 = 6.27
-M52 = 6.11
 
-COHENSD1 = .52
-SD1 = (M10 - M11) / COHENSD1
-
-M30 = 6.12
-M31 = 6.27
-COHENSD3 = .52
-SD3 = (M31 - M30) / COHENSD3
-
-SD50 = (SD1 + SD3) / 2
-SD51 = SD3
-SD52 = SD1
-lower.limit = 1
-upper.limit = 9
-
-
-## Create dataset
-### Columns
-
-PPdf5 <- c(rep(1:N50, NSTIM5), rep((N50+1):(N50+N51), NSTIM5), rep((N50+N51+1):N5, NSTIM5))
-###### Participant column: 1 to .. (each pp in control) gets repeated 60 times (for each stimulus) 
-###### Participant column: the above gets repeated but now 'pp in control + 1'  to 'pp in control + low fluency with explanation'
-###### Participant column: the above gets repeated but now 'pp in control + pp in fluency w expla + 1'  to 'pp in control + low fluency with expla + low fluency without expla'
-
-STIMdf5 <- c(rep(1:NSTIM5, each = N50), rep(1:NSTIM5, each = N51), rep(1:NSTIM5, each = N52)) 
-###### Stimulus column: Each stimulus gets repeated for each participant in control condition
-###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w expl condition
-###### Stimulus column: Each stimulus gets repeated for each participant in low fluency w/o expl condition
-
-CATdf5 <- c(rep(1:NCAT5, each = NEXAMPLARS5*N50), rep(1:NCAT5, each = NEXAMPLARS5*N51), rep(1:NCAT5, each = NEXAMPLARS5*N52)) 
-###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in control' times (for control)
-###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w expl' times(for low fluency w expl)
-###### Category column: Every category gets repeated 'number of examplars per category' x 'number of pp in low fluency w/o expl' times (for low fluency w/o expl)
-
-CONDdf5 <- c(rep(0, NSTIM5 * N50), rep(1, NSTIM5*N51), rep(2, NSTIM5*N52)) 
-###### Condition column: O gets repeated 60 x 'number of pp in control' times and afterwards 1 gets repeated 60 x 'n pp in low fluency w expl' times and afterwards 2 gets repeated 60 x 'n pp in low fluency w/o expl' times
-
-
-control5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M50, sd = SD50)) # Means for each stimulus in control condition
-fluencyw5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD51)) # Means for each stimulus in low fluency w expl
-fluencywo5 <- c(rtruncnorm(NSTIM5, a = lower.limit, b = upper.limit, mean = M51, sd = SD52)) # Means for each stimulus in low fluency w/o expl
-
-SCORE_control5 <- c()
-SCORE_fluencyw5 <- c()
-SCORE_fluencywo5 <- c()
-
-for (i in control5){ #stimulus scores are drawn for each participant with value drawn above as mean
-  SCORE_control5 <- c(SCORE_control5,(rtruncnorm(N50, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
-}
-
-for (i in fluencyw5){ #stimulus scores are drawn for each participant with value drawn above as mean
-  SCORE_fluencyw5 <- c(SCORE_fluencyw5,(rtruncnorm(N51, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
-}
-
-for (i in fluencywo5){ #stimulus scores are drawn for each participant with value drawn above as mean
-  SCORE_fluencywo5 <- c(SCORE_fluencywo5,(rtruncnorm(N52, a = lower.limit, b = upper.limit, mean = i, sd = 1)))
-}
-
-SCOREdf5 <- c()
-SCOREdf5 <- c(SCORE_control5, SCORE_fluencyw5, SCORE_fluencywo5)
-
-### Converge to dataframe
-df5 <- data.frame(PPdf5, STIMdf5, CATdf5, CONDdf5, SCOREdf5)
-
-
-
-
-############# STATISTICAL TESTS EXPERIMENT 5 ##############
-## Outliers
-### Outlier handling (check if subjects had a response bias)
-mean_subjects5 <- c() #calculate mean over participants
-for (i in 1:N5){
-  mean_subjects5 <- c(mean_subjects5,(mean(SCOREdf5[PPdf5==i])))
-}
-
-mean_subjects5 <- matrix(mean_subjects5)
-
-Q1_5 <- quantile(mean_subjects5,.25)
-Q3_5 <- quantile(mean_subjects5,.75)
-IQR_5 <- (Q3_5 - Q1_5)
-lower_5 <- Q1_5-1.5*IQR_5
-upper_5 <- Q3_5+1.5*IQR_5
-
-subject_outliers5 <- c() #check if a subject has a mean score above 'upper' or below 'lower' 
-for (i in 1:N5){
-  if (mean_subjects5[i,] < lower_5){
-    subject_outliers5 <- c(subject_outliers5, i)
-  }
-  if (mean_subjects5[i,] > upper_5){
-    subject_outliers5 <- c(subject_outliers5, i)
-  }
-}
-
-df5_no_outliers <- df5
-if (length(subject_outliers5) != 0){
-  for (i in 1:length(subject_outliers5)){ #create new dataset without 'outlier subject'
-   df5_no_outliers <- df5_no_outliers[!(df5_no_outliers$PPdf5 == subject_outliers5[i]),]
-  }
-}
-
-observations_full5 <- length(df5$SCOREdf5) #check percentage removed data (outliers)
-observations_no_outliers5 <- length(df5_no_outliers$SCOREdf5)
-percentage_removed_observations5 <- ((observations_full5-observations_no_outliers5)/observations_full5)*100
-
-
-### Boxplot 
-mean_pp5 <- c()
-for (i in 1:N5){
-  mean_pp5 <- c(mean_pp5,(mean(SCOREdf5[PPdf5==i])))
-}
-boxplot(mean_pp5, main = 'Boxplot of participant means (Experiment 5)')
-
-## Descriptives 
-### Overall mean and SD
-experiment5_mean <- mean(SCOREdf5)
-experiment5_sd <- sd(SCOREdf5)
-
-### Means and SD per condition
-experiment5_controlmean <- mean(SCOREdf5[CONDdf5=='0'])
-experiment5_fluencywoemean<- mean(SCOREdf5[CONDdf5=='1'])
-experiment5_fluencywemean<- mean(SCOREdf5[CONDdf5=='2'])
-
-experiment5_controlsd <- sd(SCOREdf5[CONDdf5=='0'])
-experiment5_fluencywoesd <- sd(SCOREdf5[CONDdf5=='1'])
-experiment5_fluencywesd <- sd(SCOREdf5[CONDdf5=='2'])
-
-### Means and SD per stimuli (per condition)
-mean_stim5 <- c()
-mean_stim_control5 <- c()
-mean_stim_fluencywoe5 <- c()
-mean_stim_fluencywe5 <- c()
-for (i in 1:NSTIM5){
-  mean_stim5 <- c(mean_stim5,(mean(SCOREdf5[STIMdf5==i])))
-  mean_stim_control5 <- c(mean_stim_control5,(mean(SCOREdf5[STIMdf5==i & CONDdf5=="0"])))
-  mean_stim_fluencywoe5 <- c(mean_stim_fluencywoe5,(mean(SCOREdf5[STIMdf5==i & CONDdf5=="1"]))) 
-  mean_stim_fluencywe5 <- c(mean_stim_fluencywe5,(mean(SCOREdf5[STIMdf5==i & CONDdf5=="2"]))) 
-}
-
-sd_stim5 <- c()
-sd_stim_control5 <- c()
-sd_stim_fluencywoe5 <- c()
-sd_stim_fluencywe5 <- c()
-for (i in 1:NSTIM5){
-  sd_stim5 <- c(sd_stim5,(sd(SCOREdf5[STIMdf5==i])))
-  sd_stim_control5 <- c(sd_stim_control5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="0"])))
-  sd_stim_fluencywoe5 <- c(sd_stim_fluencywoe5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="1"])))   
-  sd_stim_fluencywe5 <- c(sd_stim_fluencywe5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="2"])))  
-}
-
-### Means and SD per stimulus category (per condition)
-mean_cat5 <- c()
-mean_cat_control5 <- c()
-mean_cat_fluencywoe5 <- c()
-mean_cat_fluencywe5 <- c()
-for (i in 1:NCAT5){
-  mean_cat5 <- c(mean_cat5,(mean(SCOREdf5[CATdf5==i])))
-  mean_cat_control5 <- c(mean_cat_control5,(mean(SCOREdf5[CATdf5==i & CONDdf5=="0"])))
-  mean_cat_fluencywoe5 <- c(mean_cat_fluencywoe5,(mean(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
-  mean_cat_fluencywe5 <- c(mean_cat_fluencywe5,(mean(SCOREdf5[CATdf5==i & CONDdf5=="2"]))) 
-}
-
-sd_cat5 <- c()
-sd_cat_control5 <- c()
-sd_cat_fluencywoe5 <- c()
-sd_cat_fluencywe5 <- c()
-for (i in 1:NCAT5){
-  sd_cat5 <- c(sd_cat5,(sd(SCOREdf5[CATdf5==i])))
-  sd_cat_control5 <- c(sd_cat_control5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="0"])))
-  sd_cat_fluencywoe5 <- c(sd_cat_fluencywoe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
-  sd_cat_fluencywe5 <- c(sd_cat_fluencywe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
-}
-
-## Repeated measures ANOVA
-### Check Assumptions
-#### Normality
-normality5 <- shapiro.test(STIMdf5)
-#### Sphericity - is integrated into aov_ez() function
-
-### Test
-anova5 <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5, within = 'CONDdf5', correction = 'none')
-
-## Regression to assess interaction
-stimulus5 <- c(1:NSTIM5)
-stimulus_order5 <- c(1:NSTIM5)
-means_df5 <- data.frame(stimulus5,mean_stim5,mean_stim_control5,mean_stim_fluencywoe5,mean_stim_fluencywe5)
-means_df5_sorted <- data.frame(means_df5[order(means_df5[,2], decreasing = FALSE),])
-means_df5_sorted <- cbind(means_df5_sorted,stimulus_order5)
-Rating5 <- c(means_df5_sorted$mean_stim_control5,means_df5_sorted$mean_stim_fluencywoe5,means_df5_sorted$mean_stim_fluencywe5)
-Order5 <- c(rep(1:NSTIM5,3))
-Condition5 <- rep(c("Control","Low Fluency woe5","Low Fluency we5"),each=NSTIM5)
-
-data_regression5 <- data.frame(Rating5,Order5,Condition5)
-
-reg5 <- lm(Rating5 ~ Order5 + Condition5 + Order5*Condition5, data=data_regression5)
-summary(reg5)
-ggplot(data_regression5,aes(y=Rating5,x=Order5,color=Condition5))+geom_point()+stat_smooth(method="lm",se=FALSE)
-ggPredict(reg5,colorAsFactor = TRUE,interactive=TRUE)
-
-############## Experiment 5 Without Outliers ################# 
-# 'wo' added to variable name means WITHOUT outlier #
-## Descriptives 
-### Overall mean and SD
-experiment5wo_mean <- mean(df5_no_outliers$SCOREdf5)
-experiment5wo_sd <- sd(df5_no_outliers$SCOREdf5)
-
-### Means and SD per condition
-experiment5wo_controlmean <- mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='0'])
-experiment5wo_fluencywoemean<- mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='1'])
-experiment5wo_fluencywemean<- mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='2'])
-
-experiment5wo_controlsd <- sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='0'])
-experiment5wo_fluencywoesd <- sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='1'])
-experiment5wo_fluencywesd <- sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='2'])
-
-### Means and SD per stimuli (per condition)
-mean_stim5wo <- c()
-mean_stim_control5wo <- c()
-mean_stim_fluencywoe5wo <- c()
-mean_stim_fluencywe5wo <- c()
-for (i in 1:NSTIM5){
-  mean_stim5wo <- c(mean_stim5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i])))
-  mean_stim_control5wo <- c(mean_stim_control5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="0"])))
-  mean_stim_fluencywoe5wo <- c(mean_stim_fluencywoe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
-  mean_stim_fluencywe5wo <- c(mean_stim_fluencywe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="2"]))) 
-}
-
-sd_stim5wo <- c()
-sd_stim_control5wo <- c()
-sd_stim_fluencywoe5wo <- c()
-sd_stim_fluencywe5wo <- c()
-for (i in 1:NSTIM5){
-  sd_stim5wo <- c(sd_stim5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i])))
-  sd_stim_control5wo <- c(sd_stim_control5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="0"])))
-  sd_stim_fluencywoe5wo <- c(sd_stim_fluencywoe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="1"])))   
-  sd_stim_fluencywe5wo <- c(sd_stim_fluencywe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="2"])))  
-}
-
-### Means and SD per stimulus category (per condition)
-mean_cat5wo <- c()
-mean_cat_control5wo <- c()
-mean_cat_fluencywoe5wo <- c()
-mean_cat_fluencywe5wo <- c()
-for (i in 1:NCAT5){
-  mean_cat5wo <- c(mean_cat5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i])))
-  mean_cat_control5wo <- c(mean_cat_control5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="0"])))
-  mean_cat_fluencywoe5wo <- c(mean_cat_fluencywoe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
-  mean_cat_fluencywe5wo <- c(mean_cat_fluencywe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="2"]))) 
-}
-
-sd_cat5wo <- c()
-sd_cat_control5wo <- c()
-sd_cat_fluencywoe5wo <- c()
-sd_cat_fluencywe5wo <- c()
-for (i in 1:NCAT5){
-  sd_cat5wo <- c(sd_cat5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i])))
-  sd_cat_control5wo <- c(sd_cat_control5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="0"])))
-  sd_cat_fluencywoe5wo <- c(sd_cat_fluencywoe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
-  sd_cat_fluencywe5wo <- c(sd_cat_fluencywe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
-}
-
-## Repeated measures ANOVA
-### Check Assumptions
-#### Normality
-normality5wo <- shapiro.test(df5_no_outliers$STIMdf5)
-#### Sphericity - is integrated into aov_ez() function
-
-### Test
-anova5wo <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5_no_outliers, within = 'CONDdf5', correction = 'none')
-
-## Regression to assess interaction
-stimulus5 <- c(1:NSTIM5)
-stimulus_order5 <- c(1:NSTIM5)
-means_df5wo <- data.frame(stimulus5,mean_stim5wo,mean_stim_control5wo,mean_stim_fluencywoe5wo,mean_stim_fluencywe5wo)
-means_df5wo_sorted <- data.frame(means_df5wo[order(means_df5wo[,2], decreasing = FALSE),])
-means_df5wo_sorted <- cbind(means_df5wo_sorted,stimulus_order5)
-Rating5wo <- c(means_df5wo_sorted$mean_stim_control5wo,means_df5wo_sorted$mean_stim_fluencywoe5wo,means_df5wo_sorted$mean_stim_fluencywe5wo)
-Order5 <- c(rep(1:NSTIM5,3))
-Condition5 <- rep(c("Control","Low Fluency woe5","Low Fluency we5"),each=NSTIM5)
-
-data_regression5wo <- data.frame(Rating5wo,Order5,Condition5)
-
-reg5wo <- lm(Rating5wo ~ Order5 + Condition5 + Order5*Condition5, data=data_regression5wo)
-summary(reg5wo)
-ggplot(data_regression5wo,aes(y=Rating5wo,x=Order5,color=Condition5))+geom_point()+stat_smooth(method="lm",se=FALSE)
-ggPredict(reg5wo,colorAsFactor = TRUE,interactive=TRUE)
