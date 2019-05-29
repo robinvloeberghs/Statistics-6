@@ -333,6 +333,13 @@ observations_full4 <- length(df4$SCOREdf4) #check percentage removed data (outli
 observations_no_outliers4 <- length(df4_no_outliers$SCOREdf4)
 percentage_removed_observations4 <- ((observations_full4-observations_no_outliers4)/observations_full4)*100
 
+## Paired t-tests
+mean_stim_all4 <- c()
+mean_stim_all4 <- c(mean_stim_control4, mean_stim_fluency4)
+condition4 <- c(rep(0:1, each = NSTIM2))
+
+my_data_exp4 <- data.frame(mean_stim_all4,condition4)
+tresults4 <- t.test(mean_stim_all4 ~ condition4, data = my_data_exp4, paired = TRUE)
 ## Regression to assess interaction
 stimulus4 <- c(1:NSTIM4)
 stimulus_order4 <- c(1:NSTIM4)
