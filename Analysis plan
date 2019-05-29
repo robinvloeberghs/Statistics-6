@@ -201,14 +201,9 @@ for (i in 1:NCAT5){
   sd_cat_fluencywe5 <- c(sd_cat_fluencywe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
 }
 
-## Repeated measures ANOVA
-### Check Assumptions
-#### Normality
-normality5 <- shapiro.test(STIMdf5)
-#### Sphericity - is integrated into aov_ez() function
-
-### Test
-anova5 <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5, within = 'CONDdf5', correction = 'none')
+## One way ANOVA with outliers
+anova5 <- aov(SCOREdf5 ~ factor(CONDdf5), data = df5) # Anova
+TukeyHSD(anova5) # Post hoc contrasts
 
 ## Regression to assess interaction
 stimulus5 <- c(1:NSTIM5)
@@ -289,14 +284,9 @@ for (i in 1:NCAT5){
   sd_cat_fluencywe5wo <- c(sd_cat_fluencywe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
 }
 
-## Repeated measures ANOVA
-### Check Assumptions
-#### Normality
-normality5wo <- shapiro.test(df5_no_outliers$STIMdf5)
-#### Sphericity - is integrated into aov_ez() function
-
-### Test
-anova5wo <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5_no_outliers, within = 'CONDdf5', correction = 'none')
+## One way ANOVA without outliers
+anova5wo <- aov(SCOREdf5 ~ factor(CONDdf5), data = df5_no_outliers) # Anova
+TukeyHSD(anova5wo) # Post hoc contrasts
 
 ## Regression to assess interaction
 stimulus5 <- c(1:NSTIM5)
@@ -416,14 +406,6 @@ for (i in 1:N2){
 }
 boxplot(mean_pp2, main = 'Boxplot of participant means (Experiment 2)')
 
-## Paired t-tests
-mean_stim_all2 <- c()
-mean_stim_all2 <- c(mean_stim_control2, mean_stim_fluency2)
-condition2 <- c(rep(0:1, each = NSTIM2))
-
-my_data_exp2 <- data.frame(mean_stim_all2,condition2)
-tresults2 <- t.test(mean_stim_all2 ~ condition2, data = my_data_exp2, paired = TRUE)
-
 ## Descriptives 
 ### Overall mean and SD
 experiment2_mean <- mean(SCOREdf2)
@@ -474,6 +456,10 @@ for (i in 1:NCAT2){
   sd_cat_fluency2 <- c(sd_cat_fluency2,(sd(SCOREdf2[CATdf2==i & CONDdf2=="1"])))                       
 }
 
+## Independent t-test with outliers
+df2t <- aggregate.data.frame(df2, list(PPdf2), mean) # Smoothly sets up the dataframe for t test
+
+tresults2 <- t.test(SCOREdf2 ~ CONDdf2, data = df2t, paired = FALSE)
 
 ## Regression to assess interaction
 stimulus2 <- c(1:NSTIM2)
@@ -544,13 +530,10 @@ for (i in 1:NCAT2){
   sd_cat_fluency2wo <- c(sd_cat_fluency2wo,(sd(df2_no_outliers$SCOREdf2[df2_no_outliers$CATdf2==i & df2_no_outliers$CONDdf2=="1"])))                       
 }
 
-## Paired t-tests
-mean_stim_all2wo <- c()
-mean_stim_all2wo <- c(mean_stim_control2wo, mean_stim_fluency2wo)
-condition2 <- c(rep(0:1, each = NSTIM2))
+## Independent t-test without outliers
+df2wot <- aggregate.data.frame(df2_no_outliers, list(PPdf2), mean) # Smoothly sets up the dataframe for t test
 
-my_data_exp2wo <- data.frame(mean_stim_all2wo,condition2)
-tresults2wo <- t.test(mean_stim_all2wo ~ condition2, data = my_data_exp2wo, paired = TRUE)
+tresults2wo <- t.test(SCOREdf2 ~ CONDdf2, data = df2wot, paired = FALSE)
 
 ## Regression to assess interaction
 stimulus2 <- c(1:NSTIM2)
@@ -727,13 +710,12 @@ for (i in 1:NCAT4){
   sd_cat_fluency4 <- c(sd_cat_fluency4,(sd(SCOREdf4[CATdf4==i & LOWFLUENCYdf4=="1"])))                       
 }
 
-## Paired t-tests
-mean_stim_all4 <- c()
-mean_stim_all4 <- c(mean_stim_control4, mean_stim_fluency4)
-condition4 <- c(rep(0:1, each = NSTIM2))
+## Paired t-test with outliers
+df4t <- aggregate.data.frame(df4, list(PPdf4, LOWFLUENCYdf4), mean) # Smoothly sets up the dataframe for t test
+            # Calculates the means per pp per condition (LOWFLUENCY is 'condition' in this experiment)
 
-my_data_exp4 <- data.frame(mean_stim_all4,condition4)
-tresults4 <- t.test(mean_stim_all4 ~ condition4, data = my_data_exp4, paired = TRUE)
+tresults4 <- t.test(SCOREdf4 ~ LOWFLUENCYdf4, data = df4t, paired = TRUE)
+
 ## Regression to assess interaction
 stimulus4 <- c(1:NSTIM4)
 stimulus_order4 <- c(1:NSTIM4)
@@ -803,13 +785,11 @@ for (i in 1:NCAT4){
   sd_cat_fluency4wo <- c(sd_cat_fluency4wo,(sd(df4_no_outliers$SCOREdf4[df4_no_outliers$CATdf4==i & df4_no_outliers$LOWFLUENCYdf4=="1"])))                       
 }
 
-## Paired t-tests
-mean_stim_all4wo <- c()
-mean_stim_all4wo <- c(mean_stim_control4wo, mean_stim_fluency4wo)
-condition4 <- c(rep(0:1, each = NSTIM2))
+## Paired t-test without outliers
+df4wot <- aggregate.data.frame(df4_no_outliers, list(PPdf4, LOWFLUENCYdf4), mean) # Smoothly sets up the dataframe for t test
+            # Calculates the means per pp per condition (LOWFLUENCY is 'condition' in this experiment)
 
-my_data_exp4wo <- data.frame(mean_stim_all4wo,condition4)
-tresults4wo <- t.test(mean_stim_all4wo ~ condition4, data = my_data_exp4wo, paired = TRUE)
+tresults4wo <- t.test(SCOREdf4 ~ LOWFLUENCYdf4, data = df4wot, paired = TRUE)
 
 ## Regression to assess interaction
 stimulus4 <- c(1:NSTIM4)
