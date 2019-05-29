@@ -472,7 +472,7 @@ sd_stim_control5 <- c()
 sd_stim_fluencywoe5 <- c()
 sd_stim_fluencywe5 <- c()
 for (i in 1:NSTIM5){
-  sd_stim5 <- c(sd_stim5,(sd(SCOREdf3[STIMdf5==i])))
+  sd_stim5 <- c(sd_stim5,(sd(SCOREdf5[STIMdf5==i])))
   sd_stim_control5 <- c(sd_stim_control5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="0"])))
   sd_stim_fluencywoe5 <- c(sd_stim_fluencywoe5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="1"])))   
   sd_stim_fluencywe5 <- c(sd_stim_fluencywe5,(sd(SCOREdf5[STIMdf5==i & CONDdf5=="2"])))  
