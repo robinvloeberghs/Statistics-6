@@ -358,6 +358,14 @@ if (length(subject_outliers4) != 0){
 observations_full4 <- length(df4$SCOREdf4) #check percentage removed data (outliers)
 observations_no_outliers4 <- length(df4_no_outliers$SCOREdf4)
 percentage_removed_observations4 <- ((observations_full4-observations_no_outliers4)/observations_full4)*100
+
+### Boxplot 
+mean_pp4 <- c()
+for (i in 1:N4){
+  mean_pp4 <- c(mean_pp4,(mean(SCOREdf4[PPdf4==i])))
+}
+boxplot(mean_pp4, main = 'Boxplot of participant means (Experiment 4)')
+
 ## Descriptives 
 ### Overall mean and SD
 experiment4_mean <- mean(SCOREdf4)
