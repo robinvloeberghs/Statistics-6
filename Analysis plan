@@ -2,6 +2,7 @@ set.seed(20)
 library(truncnorm)
 library(ggplot2)
 library(ggiraphExtra)
+library(afex)
 
 ############ DATA SIMULATION ############
 ################################ Experiment 2 ###############################################
