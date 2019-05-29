@@ -1,0 +1,238 @@
+################################ WITHOUT OUTLIERS #####################################
+############## Experiment 2 Without Outliers ################# 
+# 'wo' added to variable name means WITHOUT outlier #
+## Descriptives 
+### Overall mean and SD
+experiment2wo_mean <- mean(df2_no_outliers$SCOREdf2)
+experiment2wo_sd <- sd(df2_no_outliers$SCOREdf2)
+
+### Means and SD per condition
+experiment2wo_controlmean <- mean(df2_no_outliers$SCOREdf2[df2_no_outliers$CONDdf2=='0'])
+experiment2wo_fluencymean<- mean(df2_no_outliers$SCOREdf2[df2_no_outliers$CONDdf2=='1'])
+
+experiment2wo_controlsd <- sd(df2_no_outliers$SCOREdf2[df2_no_outliers$CONDdf2=='0'])
+experiment2wo_fluencysd <- sd(df2_no_outliers$SCOREdf2[df2_no_outliers$CONDdf2=='1'])
+
+### Means and SD per stimuli (per condition)
+mean_stim2wo <- c()
+mean_stim_control2wo <- c()
+mean_stim_fluency2wo <- c()
+for (i in 1:NSTIM2){
+  mean_stim2wo <- c(mean_stim2wo,(mean(df2_no_outliers$SCOREdf2[df2_no_outliers$STIMdf2==i])))
+  mean_stim_control2wo <- c(mean_stim_control2wo,(mean(df2_no_outliers$SCOREdf2[df2_no_outliers$STIMdf2==i & df2_no_outliers$CONDdf2=="0"])))
+  mean_stim_fluency2wo <- c(mean_stim_fluency2wo,(mean(df2_no_outliers$SCOREdf2[df2_no_outliers$STIMdf2==i & df2_no_outliers$CONDdf2=="1"])))                       
+}
+
+sd_stim2wo <- c()
+sd_stim_control2wo <- c()
+sd_stim_fluency2wo <- c()
+for (i in 1:NSTIM2){
+  sd_stim2wo <- c(sd_stim2wo,(sd(df2_no_outliers$SCOREdf2[df2_no_outliers$STIMdf2==i])))
+  sd_stim_control2wo <- c(sd_stim_control2wo,(sd(df2_no_outliers$SCOREdf2[df2_no_outliers$STIMdf2==i & df2_no_outliers$CONDdf2=="0"])))
+  sd_stim_fluency2wo <- c(sd_stim_fluency2wo,(sd(df2_no_outliers$SCOREdf2[df2_no_outliers$STIMdf2==i & df2_no_outliers$CONDdf2=="1"])))                       
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat2wo <- c()
+mean_cat_control2wo <- c()
+mean_cat_fluency2wo <- c()
+for (i in 1:NCAT2){
+  mean_cat2wo <- c(mean_cat2wo,(mean(df2_no_outliers$SCOREdf2[df2_no_outliers$CATdf2==i])))
+  mean_cat_control2wo <- c(mean_cat_control2wo,(mean(df2_no_outliers$SCOREdf2[df2_no_outliers$CATdf2==i & df2_no_outliers$CONDdf2=="0"])))
+  mean_cat_fluency2wo <- c(mean_cat_fluency2wo,(mean(df2_no_outliers$SCOREdf2[df2_no_outliers$CATdf2==i & df2_no_outliers$CONDdf2=="1"])))                       
+}
+
+sd_cat2wo <- c()
+sd_cat_control2wo <- c()
+sd_cat_fluency2wo <- c()
+for (i in 1:NCAT2){
+  sd_cat2wo <- c(sd_cat2wo,(sd(df2_no_outliers$SCOREdf2[df2_no_outliers$CATdf2==i])))
+  sd_cat_control2wo <- c(sd_cat_control2wo,(sd(df2_no_outliers$SCOREdf2[df2_no_outliers$CATdf2==i & df2_no_outliers$CONDdf2=="0"])))
+  sd_cat_fluency2wo <- c(sd_cat_fluency2wo,(sd(df2_no_outliers$SCOREdf2[df2_no_outliers$CATdf2==i & df2_no_outliers$CONDdf2=="1"])))                       
+}
+
+## Paired t-tests
+mean_stim_all2wo <- c()
+mean_stim_all2wo <- c(mean_stim_control2wo, mean_stim_fluency2wo)
+condition2 <- c(rep(0:1, each = NSTIM2))
+
+my_data_exp2wo <- data.frame(mean_stim_all2wo,condition2)
+tresults2wo <- t.test(mean_stim_all2wo ~ condition2, data = my_data_exp2wo, paired = TRUE)
+
+## Regression to assess interaction
+stimulus2 <- c(1:NSTIM2)
+stimulus_order2 <- c(1:NSTIM2)
+means_df2wo <- data.frame(stimulus2,mean_stim2wo,mean_stim_control2wo,mean_stim_fluency2wo)
+means_df2wo_sorted <- data.frame(means_df2wo[order(means_df2wo[,2], decreasing = FALSE),]) #sort on overall mean
+means_df2wo_sorted <- cbind(means_df2wo_sorted,stimulus_order2) #stimulus order is added -> provides a rang in typicality of the stimuli
+Rating2wo <- c(means_df2wo_sorted$mean_stim_control2wo,means_df2wo_sorted$mean_stim_fluency2wo) #scores of control and fluency underneath each other
+Order2 <- c(rep(1:NSTIM2,2)) 
+Condition2 <- rep(c("Control","Low Fluency"),each=NSTIM2)
+
+data_regression2wo <- data.frame(Rating2wo,Order2,Condition2)
+
+reg2wo <- lm(Rating2wo ~ Order2 + Condition2 + Order2*Condition2, data=data_regression2wo)
+summary(reg2wo)
+ggplot(data_regression2wo,aes(y=Rating2wo,x=Order2,color=Condition2))+geom_point()+stat_smooth(method="lm",se=FALSE)
+ggPredict(reg2wo,colorAsFactor = TRUE,interactive=TRUE)
+
+
+
+
+############## Experiment 4 Without Outliers ################# 
+# 'wo' added to variable name means WITHOUT outlier #
+## Descriptives 
+### Overall mean and SD
+experiment4wo_mean <- mean(df4_no_outliers$SCOREdf4)
+experiment4wo_sd <- sd(df4_no_outliers$SCOREdf4)
+
+### Means and SD per condition
+experiment4wo_controlmean <- mean(df4_no_outliers$SCOREdf4[df4_no_outliers$LOWFLUENCYdf4=='0'])
+experiment4wo_fluencymean<- mean(df4_no_outliers$SCOREdf4[df4_no_outliers$LOWFLUENCYdf4=='1'])
+
+experiment4wo_controlsd <- sd(df4_no_outliers$SCOREdf4[df4_no_outliers$LOWFLUENCYdf4=='0'])
+experiment4wo_fluencysd <- sd(df4_no_outliers$SCOREdf4[df4_no_outliers$LOWFLUENCYf4=='1'])
+
+### Means and SD per stimuli (per condition)
+mean_stim4wo <- c()
+mean_stim_control4wo <- c()
+mean_stim_fluency4wo <- c()
+for (i in 1:NSTIM4){
+  mean_stim4wo <- c(mean_stim4wo,(mean(df4_no_outliers$SCOREdf4[df4_no_outliers$STIMdf4==i])))
+  mean_stim_control4wo <- c(mean_stim_control4wo,(mean(df4_no_outliers$SCOREdf4[df4_no_outliers$STIMdf4==i & df4_no_outliers$LOWFLUENCYdf4=="0"])))
+  mean_stim_fluency4wo <- c(mean_stim_fluency4wo,(mean(df4_no_outliers$SCOREdf4[df4_no_outliers$STIMdf4==i & df4_no_outliers$LOWFLUENCYdf4=="1"])))                       
+}
+
+sd_stim4wo <- c()
+sd_stim_control4wo <- c()
+sd_stim_fluency4wo <- c()
+for (i in 1:NSTIM4){
+  sd_stim4wo <- c(sd_stim4wo,(sd(df4_no_outliers$SCOREdf4[df4_no_outliers$STIMdf4==i])))
+  sd_stim_control4wo <- c(sd_stim_control4wo,(sd(df4_no_outliers$SCOREdf4[df4_no_outliers$STIMdf4==i & df4_no_outliers$LOWFLUENCYdf4=="0"])))
+  sd_stim_fluency4wo <- c(sd_stim_fluency4wo,(sd(df4_no_outliers$SCOREdf4[df4_no_outliers$STIMdf4==i & df4_no_outliers$LOWFLUENCYdf4=="1"])))                       
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat4wo <- c()
+mean_cat_control4wo <- c()
+mean_cat_fluency4wo <- c()
+for (i in 1:NCAT4){
+  mean_cat4wo <- c(mean_cat4wo,(mean(df4_no_outliers$SCOREdf4[df4_no_outliers$CATdf4==i])))
+  mean_cat_control4wo <- c(mean_cat_control4wo,(mean(df4_no_outliers$SCOREdf4[df4_no_outliers$CATdf4==i & df4_no_outliers$LOWFLUENCYdf4=="0"])))
+  mean_cat_fluency4wo <- c(mean_cat_fluency4wo,(mean(df4_no_outliers$SCOREdf4[df4_no_outliers$CATdf4==i & df4_no_outliers$LOWFLUENCYdf4=="1"])))                       
+}
+
+sd_cat4wo <- c()
+sd_cat_control4wo <- c()
+sd_cat_fluency4wo <- c()
+for (i in 1:NCAT4){
+  sd_cat4wo <- c(sd_cat4wo,(sd(df4_no_outliers$SCOREdf4[df4_no_outliers$CATdf4==i])))
+  sd_cat_control4wo <- c(sd_cat_control4wo,(sd(df4_no_outliers$SCOREdf4[df4_no_outliers$CATdf4==i & df4_no_outliers$LOWFLUENCYdf4=="0"])))
+  sd_cat_fluency4wo <- c(sd_cat_fluency4wo,(sd(df4_no_outliers$SCOREdf4[df4_no_outliers$CATdf4==i & df4_no_outliers$LOWFLUENCYdf4=="1"])))                       
+}
+
+## Paired t-tests
+mean_stim_all4wo <- c()
+mean_stim_all4wo <- c(mean_stim_control4wo, mean_stim_fluency4wo)
+condition4 <- c(rep(0:1, each = NSTIM2))
+
+my_data_exp4wo <- data.frame(mean_stim_all4wo,condition4)
+tresults4wo <- t.test(mean_stim_all4wo ~ condition4, data = my_data_exp4wo, paired = TRUE)
+
+## Regression to assess interaction
+stimulus4 <- c(1:NSTIM4)
+stimulus_order4 <- c(1:NSTIM4)
+means_df4wo <- data.frame(stimulus4,mean_stim4wo,mean_stim_control4wo,mean_stim_fluency4wo)
+means_df4wo_sorted <- data.frame(means_df4wo[order(means_df4wo[,2], decreasing = FALSE),])
+means_df4wo_sorted <- cbind(means_df4wo_sorted,stimulus_order4)
+Rating4wo <- c(means_df4wo_sorted$mean_stim_control4wo,means_df4wo_sorted$mean_stim_fluency4wo)
+Order4 <- c(rep(1:NSTIM4,2))
+Condition4 <- rep(c("Control","Low Fluency"),each=NSTIM4)
+
+data_regression4wo <- data.frame(Rating4wo,Order4,Condition4)
+
+reg4wo <- lm(Rating4wo ~ Order4 + Condition4 + Order4*Condition4, data=data_regression4wo)
+summary(reg4wo)
+ggplot(data_regression4wo,aes(y=Rating4wo,x=Order4,color=Condition4))+geom_point()+stat_smooth(method="lm",se=FALSE)
+ggPredict(reg4wo,colorAsFactor = TRUE,interactive=TRUE)
+
+############## Experiment 5 Without Outliers ################# 
+# 'wo' added to variable name means WITHOUT outlier #
+## Descriptives 
+### Overall mean and SD
+experiment5wo_mean <- mean(df5_no_outliers$SCOREdf5)
+experiment5wo_sd <- sd(df5_no_outliers$SCOREdf5)
+
+### Means and SD per condition
+experiment5wo_controlmean <- mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='0'])
+experiment5wo_fluencywoemean<- mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='1'])
+experiment5wo_fluencywemean<- mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='2'])
+
+experiment5wo_controlsd <- sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='0'])
+experiment5wo_fluencywoesd <- sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='1'])
+experiment5wo_fluencywesd <- sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CONDdf5=='2'])
+
+### Means and SD per stimuli (per condition)
+mean_stim5wo <- c()
+mean_stim_control5wo <- c()
+mean_stim_fluencywoe5wo <- c()
+mean_stim_fluencywe5wo <- c()
+for (i in 1:NSTIM5){
+  mean_stim5wo <- c(mean_stim5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i])))
+  mean_stim_control5wo <- c(mean_stim_control5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="0"])))
+  mean_stim_fluencywoe5wo <- c(mean_stim_fluencywoe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
+  mean_stim_fluencywe5wo <- c(mean_stim_fluencywe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="2"]))) 
+}
+
+sd_stim5wo <- c()
+sd_stim_control5wo <- c()
+sd_stim_fluencywoe5wo <- c()
+sd_stim_fluencywe5wo <- c()
+for (i in 1:NSTIM5){
+  sd_stim5wo <- c(sd_stim5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i])))
+  sd_stim_control5wo <- c(sd_stim_control5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="0"])))
+  sd_stim_fluencywoe5wo <- c(sd_stim_fluencywoe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="1"])))   
+  sd_stim_fluencywe5wo <- c(sd_stim_fluencywe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$STIMdf5==i & df5_no_outliers$CONDdf5=="2"])))  
+}
+
+### Means and SD per stimulus category (per condition)
+mean_cat5wo <- c()
+mean_cat_control5wo <- c()
+mean_cat_fluencywoe5wo <- c()
+mean_cat_fluencywe5wo <- c()
+for (i in 1:NCAT5){
+  mean_cat5wo <- c(mean_cat5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i])))
+  mean_cat_control5wo <- c(mean_cat_control5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="0"])))
+  mean_cat_fluencywoe5wo <- c(mean_cat_fluencywoe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
+  mean_cat_fluencywe5wo <- c(mean_cat_fluencywe5wo,(mean(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="2"]))) 
+}
+
+sd_cat5wo <- c()
+sd_cat_control5wo <- c()
+sd_cat_fluencywoe5wo <- c()
+sd_cat_fluencywe5wo <- c()
+for (i in 1:NCAT5){
+  sd_cat5wo <- c(sd_cat5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i])))
+  sd_cat_control5wo <- c(sd_cat_control5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="0"])))
+  sd_cat_fluencywoe5wo <- c(sd_cat_fluencywoe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
+  sd_cat_fluencywe5wo <- c(sd_cat_fluencywe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
+}
+
+## ANOVA
+
+## Regression to assess interaction
+stimulus5 <- c(1:NSTIM5)
+stimulus_order5 <- c(1:NSTIM5)
+means_df5wo <- data.frame(stimulus5,mean_stim5wo,mean_stim_control5wo,mean_stim_fluencywoe5wo,mean_stim_fluencywe5wo)
+means_df5wo_sorted <- data.frame(means_df5wo[order(means_df5wo[,2], decreasing = FALSE),])
+means_df5wo_sorted <- cbind(means_df5wo_sorted,stimulus_order5)
+Rating5wo <- c(means_df5wo_sorted$mean_stim_control5wo,means_df5wo_sorted$mean_stim_fluencywoe5wo,means_df5wo_sorted$mean_stim_fluencywe5wo)
+Order5 <- c(rep(1:NSTIM5,3))
+Condition5 <- rep(c("Control","Low Fluency woe5","Low Fluency we5"),each=NSTIM5)
+
+data_regression5wo <- data.frame(Rating5wo,Order5,Condition5)
+
+reg5wo <- lm(Rating5wo ~ Order5 + Condition5 + Order5*Condition5, data=data_regression5wo)
+summary(reg5wo)
+ggplot(data_regression5wo,aes(y=Rating5wo,x=Order5,color=Condition5))+geom_point()+stat_smooth(method="lm",se=FALSE)
+ggPredict(reg5wo,colorAsFactor = TRUE,interactive=TRUE)
