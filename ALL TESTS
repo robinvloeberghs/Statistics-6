@@ -1,0 +1,32 @@
+#### EXPERIMENT 1 #####
+## One way ANOVA with outliers
+anova5 <- aov(SCOREdf5 ~ factor(CONDdf5), data = df5) # Anova
+TukeyHSD(anova5) # Post hoc contrasts
+
+## One way ANOVA without outliers
+anova5wo <- aov(SCOREdf5 ~ factor(CONDdf5), data = df5_no_outliers) # Anova
+TukeyHSD(anova5wo) # Post hoc contrasts
+
+#### EXPERIMENT 2 ####
+## Independent t-test with outliers
+df2t <- aggregate.data.frame(df2, list(PPdf2), mean) # Smoothly sets up the dataframe for t test
+
+tresults2 <- t.test(SCOREdf2 ~ CONDdf2, data = df2t, paired = FALSE)
+
+## Independent t-test without outliers
+df2wot <- aggregate.data.frame(df2_no_outliers, list(PPdf2), mean) # Smoothly sets up the dataframe for t test
+
+tresults2wo <- t.test(SCOREdf2 ~ CONDdf2, data = df2wot, paired = FALSE)
+
+#### EXPERIMENT 3 ####
+## Paired t-test with outliers
+df4t <- aggregate.data.frame(df4, list(PPdf4, LOWFLUENCYdf4), mean) # Smoothly sets up the dataframe for t test
+            # Calculates the means per pp per condition (LOWFLUENCY is 'condition' in this experiment)
+
+tresults4 <- t.test(SCOREdf4 ~ LOWFLUENCYdf4, data = df4t, paired = TRUE)
+
+## Paired t-test without outliers
+df4wot <- aggregate.data.frame(df4_no_outliers, list(PPdf4, LOWFLUENCYdf4), mean) # Smoothly sets up the dataframe for t test
+            # Calculates the means per pp per condition (LOWFLUENCY is 'condition' in this experiment)
+
+tresults4wo <- t.test(SCOREdf4 ~ LOWFLUENCYdf4, data = df4wot, paired = TRUE)
