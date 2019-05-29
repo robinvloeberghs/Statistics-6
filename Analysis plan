@@ -692,7 +692,15 @@ for (i in 1:NCAT5){
   sd_cat_fluencywoe5 <- c(sd_cat_fluencywoe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
   sd_cat_fluencywe5 <- c(sd_cat_fluencywe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
 }
-## ANOVA
+
+## Repeated measures ANOVA
+### Check Assumptions
+#### Normality
+normality5 <- shapiro.test(STIMdf5)
+#### Sphericity - is integrated into aov_ez() function
+
+### Test
+anova5 <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5, within = 'CONDdf5', correction = 'none')
 
 ## Regression to assess interaction
 stimulus5 <- c(1:NSTIM5)
@@ -773,7 +781,14 @@ for (i in 1:NCAT5){
   sd_cat_fluencywe5wo <- c(sd_cat_fluencywe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
 }
 
-## ANOVA
+## Repeated measures ANOVA
+### Check Assumptions
+#### Normality
+normality5wo <- shapiro.test(df5_no_outliers$STIMdf5)
+#### Sphericity - is integrated into aov_ez() function
+
+### Test
+anova5wo <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5_no_outliers, within = 'CONDdf5', correction = 'none')
 
 ## Regression to assess interaction
 stimulus5 <- c(1:NSTIM5)
