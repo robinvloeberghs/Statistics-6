@@ -4,6 +4,19 @@ library(ggplot2)
 library(ggiraphExtra)
 library(afex)
 
+
+#######POWER ANALYSIS 
+
+library(pwr)
+
+#Experiment 1 
+pwr.anova.test(k= 3, n= NULL, f= 0.25, sig.level=0.05, power=0.80)
+
+#Experiment 2
+pwr.t.test(n =NULL, d= 0.50, sig.level=0.05, power=0.80, type= "two.sample", alternative="two.sided")
+
+#Experiment 3
+pwr.t.test(n =NULL, d= 0.5, sig.level=0.05, power=0.80, type= "paired", alternative="two.sided")
 ############################### Experiment 1: Experiment 1 & 3 combined ##################################
 # Variables coded for previously named experiment 5 #
 ## Variables
