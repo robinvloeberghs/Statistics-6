@@ -434,12 +434,6 @@ for (i in 1:N2){
 }
 boxplot(mean_pp2, main = 'Boxplot of participant means (Experiment 2)')
 
-## Independent t-test with outliers
-df2t <- aggregate.data.frame(df2, list(PPdf2), mean) # Smoothly sets up the dataframe for t test
-
-tresults2 <- t.test(SCOREdf2 ~ CONDdf2, data = df2t, paired = FALSE)
-
-
 ## Descriptives 
 ### Overall mean and SD
 experiment2_mean <- mean(SCOREdf2)
@@ -489,6 +483,11 @@ for (i in 1:NCAT2){
   sd_cat_control2 <- c(sd_cat_control2,(sd(SCOREdf2[CATdf2==i & CONDdf2=="0"])))
   sd_cat_fluency2 <- c(sd_cat_fluency2,(sd(SCOREdf2[CATdf2==i & CONDdf2=="1"])))                       
 }
+
+## Independent t-test with outliers
+df2t <- aggregate.data.frame(df2, list(PPdf2), mean) # Smoothly sets up the dataframe for t test
+
+tresults2 <- t.test(SCOREdf2 ~ CONDdf2, data = df2t, paired = FALSE)
 
 
 ## Regression to assess interaction
@@ -565,7 +564,7 @@ for (i in 1:NCAT2){
 }
 
 ## Independent t-test without outliers
-df2wot <- aggregate.data.frame(df2_no_outliers, list(PPdf2), mean) # Smoothly sets up the dataframe for t test
+df2wot <- aggregate.data.frame(df2_no_outliers, list(df2_no_outliers$PPdf2), mean) # Smoothly sets up the dataframe for t test
 
 tresults2wo <- t.test(SCOREdf2 ~ CONDdf2, data = df2wot, paired = FALSE)
 
@@ -827,7 +826,7 @@ for (i in 1:NCAT4){
 }
 
 ## Paired t-test without outliers
-df4wot <- aggregate.data.frame(df4_no_outliers, list(PPdf4, LOWFLUENCYdf4), mean) # Smoothly sets up the dataframe for t test
+df4wot <- aggregate.data.frame(df4_no_outliers, list(df4_no_outliers$PPdf4, df4_no_outliers$LOWFLUENCYdf4), mean) # Smoothly sets up the dataframe for t test
 # Calculates the means per pp per condition (LOWFLUENCY is 'condition' in this experiment)
 
 tresults4wo <- t.test(SCOREdf4 ~ LOWFLUENCYdf4, data = df4wot, paired = TRUE)
