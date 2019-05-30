@@ -1,23 +1,23 @@
-set.seed(20)
+#Install if necessary
+
+#install.packages("truncnorm")
+#install.packages("ggplot2")
+#install.packages("ggiraphExtra")
+#install.packages("afex")
+#install.packages("pwr")
+
 library(truncnorm)
 library(ggplot2)
 library(ggiraphExtra)
 library(afex)
-
-
-#######POWER ANALYSIS 
-
 library(pwr)
 
-#Experiment 1 
+
+############################### Experiment 1: Experiment 1 & 3 combined ##################################
+
+# Power analysis
 pwr.anova.test(k= 3, n= NULL, f= 0.25, sig.level=0.05, power=0.80)
 
-#Experiment 2
-pwr.t.test(n =NULL, d= 0.50, sig.level=0.05, power=0.80, type= "two.sample", alternative="two.sided")
-
-#Experiment 3
-pwr.t.test(n =NULL, d= 0.5, sig.level=0.05, power=0.80, type= "paired", alternative="two.sided")
-############################### Experiment 1: Experiment 1 & 3 combined ##################################
 # Variables coded for previously named experiment 5 #
 ## Variables
 N5 = 120 # Divide equally into three groups
@@ -29,6 +29,9 @@ COND5 = 3 # 0 = control; 1 = low fluency with explanation; 2 = low fluency witho
 M50 = (6.26 + 6.12)/2 
 M51 = 6.27
 M52 = 6.11
+
+M10 = 6.26 
+M11 = 6.11
 
 COHENSD1 = .52
 SD1 = (M10 - M11) / COHENSD1
@@ -45,6 +48,7 @@ lower.limit = 1
 upper.limit = 9
 
 
+#Data simulation
 ## Create dataset
 ### Columns
 
@@ -125,7 +129,7 @@ for (i in 1:N5){
 df5_no_outliers <- df5
 if (length(subject_outliers5) != 0){
   for (i in 1:length(subject_outliers5)){ #create new dataset without 'outlier subject'
-   df5_no_outliers <- df5_no_outliers[!(df5_no_outliers$PPdf5 == subject_outliers5[i]),]
+    df5_no_outliers <- df5_no_outliers[!(df5_no_outliers$PPdf5 == subject_outliers5[i]),]
   }
 }
 
@@ -201,9 +205,15 @@ for (i in 1:NCAT5){
   sd_cat_fluencywe5 <- c(sd_cat_fluencywe5,(sd(SCOREdf5[CATdf5==i & CONDdf5=="1"]))) 
 }
 
-## One way ANOVA with outliers
-anova5 <- aov(SCOREdf5 ~ factor(CONDdf5), data = df5) # Anova
-TukeyHSD(anova5) # Post hoc contrasts
+## Repeated measures ANOVA
+### Check assumptions
+#### Normality
+normality5 <- shapiro.test(STIMdf5)
+#### Sphericity - is integrated into aov_ez() function
+
+### Test
+anova5 <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5, within = 'CONDdf5', correction = 'none')
+summary(anova5)
 
 ## Regression to assess interaction
 stimulus5 <- c(1:NSTIM5)
@@ -221,6 +231,9 @@ reg5 <- lm(Rating5 ~ Order5 + Condition5 + Order5*Condition5, data=data_regressi
 summary(reg5)
 ggplot(data_regression5,aes(y=Rating5,x=Order5,color=Condition5))+geom_point()+stat_smooth(method="lm",se=FALSE)
 ggPredict(reg5,colorAsFactor = TRUE,interactive=TRUE)
+
+### Check assumptions
+plot(reg5)
 
 ############## Experiment 1 Without Outliers ################# 
 # 'wo' added to variable name means WITHOUT outlier #
@@ -284,9 +297,14 @@ for (i in 1:NCAT5){
   sd_cat_fluencywe5wo <- c(sd_cat_fluencywe5wo,(sd(df5_no_outliers$SCOREdf5[df5_no_outliers$CATdf5==i & df5_no_outliers$CONDdf5=="1"]))) 
 }
 
-## One way ANOVA without outliers
-anova5wo <- aov(SCOREdf5 ~ factor(CONDdf5), data = df5_no_outliers) # Anova
-TukeyHSD(anova5wo) # Post hoc contrasts
+## Repeated measures ANOVA
+### Check Assumptions
+#### Normality
+normality5wo <- shapiro.test(df5_no_outliers$STIMdf5)
+#### Sphericity - is integrated into aov_ez() function
+
+### Test
+anova5wo <- aov_ez(id = 'STIMdf5', dv = 'SCOREdf5', data = df5_no_outliers, within = 'CONDdf5', correction = 'none')
 
 ## Regression to assess interaction
 stimulus5 <- c(1:NSTIM5)
@@ -304,8 +322,16 @@ reg5wo <- lm(Rating5wo ~ Order5 + Condition5 + Order5*Condition5, data=data_regr
 summary(reg5wo)
 ggplot(data_regression5wo,aes(y=Rating5wo,x=Order5,color=Condition5))+geom_point()+stat_smooth(method="lm",se=FALSE)
 ggPredict(reg5wo,colorAsFactor = TRUE,interactive=TRUE)
-############ DATA SIMULATION ############
+
+### Check assumptions
+plot(reg5wo)
+
 ################################ Experiment 2 ###############################################
+
+# Power analysis
+pwr.t.test(n =NULL, d= 0.50, sig.level=0.05, power=0.80, type= "two.sample", alternative="two.sided")
+
+#Data simulation
 ## Variables
 N2 = 43
 N20 = 22
@@ -390,7 +416,7 @@ for (i in 1:N2){
 df2_no_outliers <- df2
 if (length(subject_outliers2) != 0){
   for (i in 1:length(subject_outliers2)){ #create new dataset without 'outlier subject'
-   df2_no_outliers <- df2_no_outliers[!(df2_no_outliers$PPdf2 == subject_outliers2[i]),]
+    df2_no_outliers <- df2_no_outliers[!(df2_no_outliers$PPdf2 == subject_outliers2[i]),]
   }
 }
 
@@ -405,6 +431,14 @@ for (i in 1:N2){
   mean_pp2 <- c(mean_pp2,(mean(SCOREdf2[PPdf2==i])))
 }
 boxplot(mean_pp2, main = 'Boxplot of participant means (Experiment 2)')
+
+## Paired t-tests
+mean_stim_all2 <- c()
+mean_stim_all2 <- c(mean_stim_control2, mean_stim_fluency2)
+condition2 <- c(rep(0:1, each = NSTIM2))
+
+my_data_exp2 <- data.frame(mean_stim_all2,condition2)
+tresults2 <- t.test(mean_stim_all2 ~ condition2, data = my_data_exp2, paired = TRUE)
 
 ## Descriptives 
 ### Overall mean and SD
@@ -456,10 +490,6 @@ for (i in 1:NCAT2){
   sd_cat_fluency2 <- c(sd_cat_fluency2,(sd(SCOREdf2[CATdf2==i & CONDdf2=="1"])))                       
 }
 
-## Independent t-test with outliers
-df2t <- aggregate.data.frame(df2, list(PPdf2), mean) # Smoothly sets up the dataframe for t test
-
-tresults2 <- t.test(SCOREdf2 ~ CONDdf2, data = df2t, paired = FALSE)
 
 ## Regression to assess interaction
 stimulus2 <- c(1:NSTIM2)
@@ -477,6 +507,9 @@ reg2 <- lm(Rating2 ~ Order2 + Condition2 + Order2*Condition2, data=data_regressi
 summary(reg2)
 ggplot(data_regression2,aes(y=Rating2,x=Order2,color=Condition2))+geom_point()+stat_smooth(method="lm",se=FALSE)
 ggPredict(reg2,colorAsFactor = TRUE,interactive=TRUE)
+
+### Check assumptions
+plot(reg2)
 
 ############## Experiment 2 Without Outliers ################# 
 # 'wo' added to variable name means WITHOUT outlier #
@@ -530,10 +563,13 @@ for (i in 1:NCAT2){
   sd_cat_fluency2wo <- c(sd_cat_fluency2wo,(sd(df2_no_outliers$SCOREdf2[df2_no_outliers$CATdf2==i & df2_no_outliers$CONDdf2=="1"])))                       
 }
 
-## Independent t-test without outliers
-df2wot <- aggregate.data.frame(df2_no_outliers, list(PPdf2), mean) # Smoothly sets up the dataframe for t test
+## Paired t-tests
+mean_stim_all2wo <- c()
+mean_stim_all2wo <- c(mean_stim_control2wo, mean_stim_fluency2wo)
+condition2 <- c(rep(0:1, each = NSTIM2))
 
-tresults2wo <- t.test(SCOREdf2 ~ CONDdf2, data = df2wot, paired = FALSE)
+my_data_exp2wo <- data.frame(mean_stim_all2wo,condition2)
+tresults2wo <- t.test(mean_stim_all2wo ~ condition2, data = my_data_exp2wo, paired = TRUE)
 
 ## Regression to assess interaction
 stimulus2 <- c(1:NSTIM2)
@@ -552,11 +588,17 @@ summary(reg2wo)
 ggplot(data_regression2wo,aes(y=Rating2wo,x=Order2,color=Condition2))+geom_point()+stat_smooth(method="lm",se=FALSE)
 ggPredict(reg2wo,colorAsFactor = TRUE,interactive=TRUE)
 
-
+### Check assumptions
+plot(reg2wo)
 
 
 
 #################################### Experiment 3 ###############################################
+
+# Power analysis
+pwr.t.test(n =NULL, d= 0.5, sig.level=0.05, power=0.80, type= "paired", alternative="two.sided")
+
+
 # Variables coded for previously named experiment 4 #
 ## Variables
 N4 = 120
@@ -574,6 +616,7 @@ M41 = mean(M10, M11) - (.46 / 2)
 COHENSD4 = 2.17
 SD4 = .46 / COHENSD4
 
+# Data simulation
 ## Create dataset
 ### Columns
 PPdf4 <- c(rep(1:N4, each = NSTIM4))
@@ -710,12 +753,13 @@ for (i in 1:NCAT4){
   sd_cat_fluency4 <- c(sd_cat_fluency4,(sd(SCOREdf4[CATdf4==i & LOWFLUENCYdf4=="1"])))                       
 }
 
-## Paired t-test with outliers
-df4t <- aggregate.data.frame(df4, list(PPdf4, LOWFLUENCYdf4), mean) # Smoothly sets up the dataframe for t test
-            # Calculates the means per pp per condition (LOWFLUENCY is 'condition' in this experiment)
+## Paired t-tests
+mean_stim_all4 <- c()
+mean_stim_all4 <- c(mean_stim_control4, mean_stim_fluency4)
+condition4 <- c(rep(0:1, each = NSTIM2))
 
-tresults4 <- t.test(SCOREdf4 ~ LOWFLUENCYdf4, data = df4t, paired = TRUE)
-
+my_data_exp4 <- data.frame(mean_stim_all4,condition4)
+tresults4 <- t.test(mean_stim_all4 ~ condition4, data = my_data_exp4, paired = TRUE)
 ## Regression to assess interaction
 stimulus4 <- c(1:NSTIM4)
 stimulus_order4 <- c(1:NSTIM4)
@@ -732,6 +776,10 @@ reg4 <- lm(Rating4 ~ Order4 + Condition4 + Order4*Condition4, data=data_regressi
 summary(reg4)
 ggplot(data_regression4,aes(y=Rating4,x=Order4,color=Condition4))+geom_point()+stat_smooth(method="lm",se=FALSE)
 ggPredict(reg4,colorAsFactor = TRUE,interactive=TRUE)
+
+### Check assumptions
+plot(reg4)
+
 
 ############## Experiment 3 Without Outliers ################# 
 # 'wo' added to variable name means WITHOUT outlier #
@@ -785,11 +833,13 @@ for (i in 1:NCAT4){
   sd_cat_fluency4wo <- c(sd_cat_fluency4wo,(sd(df4_no_outliers$SCOREdf4[df4_no_outliers$CATdf4==i & df4_no_outliers$LOWFLUENCYdf4=="1"])))                       
 }
 
-## Paired t-test without outliers
-df4wot <- aggregate.data.frame(df4_no_outliers, list(PPdf4, LOWFLUENCYdf4), mean) # Smoothly sets up the dataframe for t test
-            # Calculates the means per pp per condition (LOWFLUENCY is 'condition' in this experiment)
+## Paired t-tests
+mean_stim_all4wo <- c()
+mean_stim_all4wo <- c(mean_stim_control4wo, mean_stim_fluency4wo)
+condition4 <- c(rep(0:1, each = NSTIM2))
 
-tresults4wo <- t.test(SCOREdf4 ~ LOWFLUENCYdf4, data = df4wot, paired = TRUE)
+my_data_exp4wo <- data.frame(mean_stim_all4wo,condition4)
+tresults4wo <- t.test(mean_stim_all4wo ~ condition4, data = my_data_exp4wo, paired = TRUE)
 
 ## Regression to assess interaction
 stimulus4 <- c(1:NSTIM4)
@@ -807,6 +857,10 @@ reg4wo <- lm(Rating4wo ~ Order4 + Condition4 + Order4*Condition4, data=data_regr
 summary(reg4wo)
 ggplot(data_regression4wo,aes(y=Rating4wo,x=Order4,color=Condition4))+geom_point()+stat_smooth(method="lm",se=FALSE)
 ggPredict(reg4wo,colorAsFactor = TRUE,interactive=TRUE)
+
+### Check assumptions
+plot(reg4wo)
+
 
 
 
