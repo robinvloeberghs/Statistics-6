@@ -30,7 +30,7 @@ pwr.t.test(n =NULL, d= 0.5, sig.level=0.05, power=0.80, type= "paired", alternat
 
 # Variables coded for previously named experiment 5 #
 ## Variables
-N5 = 120 # Divide equally into three groups
+N5 = 159 # Divide equally into three groups
 N50 = N51 = N52 = N5 / 3
 NSTIM5 = 60
 NEXAMPLARS5 = 15
@@ -335,9 +335,8 @@ plot(reg5wo)
 
 #Data simulation
 ## Variables
-N2 = 43
-N20 = 22
-N21 = 21
+N2 = 128
+N20 = N21 = N2/2
 NSTIM2 = 30
 NFEAT2 = 5
 NCAT2 = 6
@@ -594,7 +593,7 @@ plot(reg2wo)
 
 # Variables coded for previously named experiment 4 #
 ## Variables
-N4 = 120
+N4 = 36
 N40 = N41 = N42 = N43 = N4 / 4
 NSTIM4 = 60 #15 examplars for each category
 NCAT4 = 4
@@ -851,3 +850,5 @@ ggPredict(reg4wo,colorAsFactor = TRUE,interactive=TRUE)
 
 ### Check assumptions
 plot(reg4wo)
+
+
